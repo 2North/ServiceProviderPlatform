@@ -23,5 +23,5 @@ server:
 
 app:
   jwt:
-    secret: change-me-in-production-must-be-at-least-256-bits-long
+    secret: dGhpcy1pcy1hLXZlcnktbG9uZy1zZWNyZXQta2V5LWZvci1zaWduaW5nLWp3dC10b2tlbnMtaW4tc3BwLWFwcA==
     expiration: 86400000
