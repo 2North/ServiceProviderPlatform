@@ -28,6 +28,9 @@ public class Service {
     @JoinColumn(name = "category_id")
     Category category;
 
+    @Column(nullable = false)
+    String title;
+
     String description;
 
     @Column(nullable = false)
