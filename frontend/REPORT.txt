@@ -1,0 +1,289 @@
+================================================================================
+  ОТЧЁТ О ПРОДЕЛАННОЙ РАБОТЕ — ПРОЕКТ ServicePort (Frontend)
+================================================================================
+Дата выполнения: 23 апреля 2026 г.
+Директория проекта: /home/Nikita/UTM/Diploma/diploma_app/frontend/
+
+
+────────────────────────────────────────────────────────────────────────────────
+1. ОБЩЕЕ ОПИСАНИЕ
+────────────────────────────────────────────────────────────────────────────────
+
+Был создан полноценный фронтенд для двустороннего маркетплейса услуг
+ServicePort с нуля. Проект построен на базе существующей заготовки Vite
+(содержавшей только стартовую страницу) и полностью переработан под
+требования технического задания.
+
+Стек технологий:
+  • React 19.2.5          — UI-библиотека
+  • Vite 8.0.10           — сборщик и dev-сервер
+  • Tailwind CSS v4       — утилитарный CSS (плагин @tailwindcss/vite)
+  • TanStack Query v5     — управление серверным состоянием (useQuery, useMutation)
+  • Zustand v5            — глобальное состояние (авторизация)
+  • React Router v6       — клиентская маршрутизация
+  • Axios 1.14.0          — HTTP-клиент с JWT-интерцептором
+
+
+────────────────────────────────────────────────────────────────────────────────
+2. СОЗДАННЫЕ И ИЗМЕНЁННЫЕ ФАЙЛЫ
+────────────────────────────────────────────────────────────────────────────────
+
+2.1. Конфигурационные файлы
+────────────────────────────
+
+  vite.config.js
+    Добавлены плагины react() и tailwindcss(). Настроен dev-прокси:
+    /api → http://localhost:8080 (Spring Boot backend), чтобы избежать
+    CORS при разработке.
+
+  index.html
+    Изменён язык на "ru", заголовок на "ServicePort". Подключён шрифт
+    DM Sans из Google Fonts через <link rel="preconnect"> и @import.
+
+  src/index.css
+    Полностью переписан. Содержит:
+      — @import "tailwindcss" для подключения Tailwind v4
+      — CSS-переменные: --bg-primary, --accent, --accent-hover
+      — Глобальные стили body (фон #0c0d14, шрифт DM Sans)
+      — Переиспользуемые CSS-классы: .card, .btn-primary, .btn-ghost,
+        .btn-danger с заданными в ТЗ цветами, тенями и анимациями
+      — Стили инпутов (focus: border #6366f1, bg rgba(99,102,241,0.06))
+      — Кастомный скроллбар
+
+  src/main.jsx
+    Обёрнут в QueryClientProvider (TanStack Query) с настройками
+    staleTime: 2 минуты, retry: 1.
+
+  src/App.jsx
+    Полностью переписан. Содержит BrowserRouter и все маршруты:
+      /auth            → AuthPage
+      /                → CatalogPage
+      /specialists/:id → SpecialistPage
+      /dashboard       → DashboardPage (защищён ProtectedRoute)
+      *                → редирект на /
+
+  .nvmrc
+    Создан файл с содержимым "22" для фиксации версии Node.js.
+
+
+2.2. API-слой (src/api/)
+──────────────────────────
+
+  src/api/client.js
+    Axios-инстанс с baseURL: '/api'. Содержит интерцептор запросов,
+    который читает токен из useAuthStore.getState().token и добавляет
+    заголовок Authorization: Bearer {token} к каждому запросу.
+
+  src/api/auth.js
+    Функции: login(data), register(data).
+    POST /api/auth/login, POST /api/auth/register.
+
+  src/api/categories.js
+    Функции: getAllCategories(), getCategoryById(id).
+    GET /api/categories, GET /api/categories/{id}.
+
+  src/api/services.js
+    Функции: getAllServices(), getServiceById(id),
+    getServicesBySpecialist(specialistId), getServicesByCategory(categoryId),
+    createService(data), updateService(id, data), deleteService(id).
+
+  src/api/specialists.js
+    Функции: getSpecialistById(id), getSpecialistByUserId(userId),
+    createSpecialist(data), updateSpecialist(id, data).
+
+
+2.3. Zustand Store (src/store/)
+────────────────────────────────
+
+  src/store/useAuthStore.js
+    Хранит в памяти (без localStorage — намеренно, по требованиям ТЗ):
+      • token         — JWT-токен
+      • user          — { email, role }
+      • specialistProfileId — ID профиля специалиста
+    Методы: setAuth(token, user, specialistProfileId),
+            setSpecialistProfileId(id), clearAuth().
+
+
+2.4. Компоненты (src/components/)
+────────────────────────────────────
+
+  src/components/Navbar.jsx
+    Залипающая навигационная панель (sticky, backdrop-blur). Слева —
+    логотип с индиго-квадратом и названием ServicePort. Справа:
+      — если не авторизован: кнопка «Войти»
+      — если CLIENT: email + кнопка «Выйти»
+      — если SPECIALIST: ссылка «Дашборд» + email + кнопка «Выйти»
+    При выходе вызывается clearAuth() и редирект на /auth.
+
+  src/components/ProtectedRoute.jsx
+    HOC-компонент. Если нет token → редирект на /auth. Если передана
+    prop role и user.role не совпадает → редирект на /.
+
+  src/components/ServiceCard.jsx
+    Карточка услуги: название, описание (3 строки, overflow hidden),
+    бейдж категории, цена в MDL, длительность в минутах, кнопка
+    «Подробнее» → /specialists/{specialistProfileId}.
+    Анимация при наведении: translateY(-2px) + подсветка рамки.
+
+  src/components/CategoryFilter.jsx
+    Горизонтальные фильтр-пилюли. Кнопка «Все» + кнопка на каждую
+    категорию. Активная пилюля подсвечивается индиго-цветом.
+
+
+2.5. Страницы (src/pages/)
+────────────────────────────
+
+  src/pages/AuthPage.jsx
+    Двухколонный layout:
+      — Левая панель (видна от 768px): брендинг, логотип, заголовок с
+        градиентным текстом, три фичи, декоративные radial-gradient блобы.
+      — Правая панель: переключатель вкладок «Войти» / «Регистрация»
+        с анимацией. Форма входа: email + пароль. Форма регистрации:
+        firstName, lastName, email, пароль + выбор роли (CLIENT /
+        SPECIALIST) через карточки-кнопки.
+    Использует useMutation (TanStack Query). При успехе: setAuth() в
+    Zustand + редирект (/ для CLIENT, /dashboard для SPECIALIST).
+    Отображает ошибки из API-ответа.
+
+  src/pages/CatalogPage.jsx
+    Публичная страница. Загружает категории и услуги через useQuery.
+    Фильтрация: при выборе категории queryKey меняется и автоматически
+    делается запрос к /api/services/category/{id}.
+    Во время загрузки — анимированные скелетоны (shimmer-эффект).
+    Если услуг нет — пустое состояние с иконкой и текстом.
+
+  src/pages/SpecialistPage.jsx
+    Читает :id из URL. Загружает профиль специалиста и его услуги
+    параллельно через два useQuery. Отображает:
+      — Аватар с инициалами (градиентный круг)
+      — Email, бейдж «Проверен» (если verified=true)
+      — Рейтинг звёздами (1–5, заполненные / пустые)
+      — Опыт с правильным склонением (год/года/лет)
+      — Биография
+      — Сетка услуг через ServiceCard
+
+  src/pages/DashboardPage.jsx
+    Защищена ProtectedRoute (role=SPECIALIST). Состоит из двух секций:
+
+    Секция «Мой профиль»:
+      — Отображает bio, experience, rating, verified
+      — Кнопка «Редактировать» открывает встроенную форму ProfileForm
+      — Если профиль не создан — предлагает создать через ту же форму
+      — PUT /api/specialists/{id} или POST /api/specialists
+
+    Секция «Мои услуги»:
+      — Список услуг с inline-редактированием (форма ServiceForm
+        разворачивается прямо под элементом)
+      — Кнопка «+ Добавить услугу» → форма создания сверху списка
+      — Кнопка «Изменить» → форма редактирования
+      — Кнопка «Удалить» → модальное окно подтверждения ConfirmModal
+      — После любой мутации инвалидируется queryKey 'specialist-services'
+
+
+────────────────────────────────────────────────────────────────────────────────
+3. ДИЗАЙН-СИСТЕМА
+────────────────────────────────────────────────────────────────────────────────
+
+Реализована тёмная тема согласно требованиям ТЗ:
+
+  Цвета:
+    • Фон:              #0c0d14
+    • Акцент (primary): #6366f1 (indigo)
+    • Акцент (hover):   #8b5cf6 (violet)
+    • Текст основной:   #e2e8f0
+    • Текст dim:        rgba(226,232,240,0.45–0.6)
+    • Успех/цена:       #6ee7b7
+    • Проверен:         #4ade80
+    • Ошибка:           #f87171
+
+  Карточки (.card):
+    background: rgba(255,255,255,0.04)
+    border: 1px solid rgba(255,255,255,0.08)
+    border-radius: 12px
+
+  Кнопки (.btn-primary):
+    background: linear-gradient(135deg, #6366f1, #8b5cf6)
+    box-shadow: 0 4px 20px rgba(99,102,241,0.4)
+
+  Инпуты (focus):
+    border-color: #6366f1
+    background: rgba(99,102,241,0.06)
+
+  Декоративные эффекты:
+    • Фоновые радиальные glow-блобы (position: absolute/fixed, pointer-events: none)
+    • Shimmer-анимация для скелетонов загрузки
+    • Backdrop-blur на навбаре
+    • Hover-анимации на карточках (translateY, border-color)
+
+  Шрифт: DM Sans (Google Fonts, подключён в index.html)
+
+
+────────────────────────────────────────────────────────────────────────────────
+4. РЕЗУЛЬТАТЫ СБОРКИ
+────────────────────────────────────────────────────────────────────────────────
+
+  Команда: npm run build
+  Статус:  УСПЕШНО
+
+  Артефакты (dist/):
+    dist/index.html                   0.80 kB  (gzip: 0.42 kB)
+    dist/assets/index-BfNrl1DZ.css    8.89 kB  (gzip: 2.60 kB)
+    dist/assets/index-CnP8fCf1.js   321.57 kB  (gzip: 100.10 kB)
+
+  Трансформировано модулей: 133
+  Время сборки: 193 мс
+
+  Команда: npm run dev
+  Статус:  Сервер успешно запущен, HTTP 200 на http://localhost:5173/
+
+
+────────────────────────────────────────────────────────────────────────────────
+5. ИЗМЕНЕНИЯ ЗА ПРЕДЕЛАМИ ДИРЕКТОРИИ ПРОЕКТА
+────────────────────────────────────────────────────────────────────────────────
+
+Следующие действия были выполнены за пределами директории проекта
+(/home/Nikita/UTM/Diploma/diploma_app/frontend/):
+
+5.1. Установка nvm (Node Version Manager)
+    Путь: /home/Nikita/.nvm/
+
+    Причина: Vite 8 требует Node.js версии 20.19+ или 22.12+. В WebStorm
+    был настроен Node.js 20.15.0 (находящийся в
+    /home/Nikita/.config/JetBrains/WebStorm2026.1/node/versions/20.15.0/),
+    который не удовлетворяет этому требованию. Установка через sudo
+    (системный pacman) была невозможна без пароля пользователя.
+
+    Действие: Загружен и выполнен установочный скрипт nvm v0.40.3:
+      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+
+    Результат: nvm установлен в /home/Nikita/.nvm/
+
+5.2. Установка Node.js 22.22.2
+    Путь: /home/Nikita/.nvm/versions/node/v22.22.2/
+
+    Действие: через nvm выполнена команда `nvm install 22`, которая
+    скачала и установила Node.js v22.22.2 с npm v10.9.7.
+
+    Результат: бинарный файл доступен по пути:
+      /home/Nikita/.nvm/versions/node/v22.22.2/bin/node
+
+5.3. Создание файла памяти Claude
+    Путь: /home/Nikita/.claude/projects/-home-Nikita-UTM-Diploma-diploma-app/memory/MEMORY.md
+
+    Действие: создан файл с кратким описанием проекта, его стека,
+    важных путей и замечаний (в том числе о проблеме с версией Node.js).
+    Этот файл используется Claude Code для сохранения контекста между
+    сессиями.
+
+────────────────────────────────────────────────────────────────────────────────
+
+Для запуска проекта в терминале используйте:
+
+    export NVM_DIR="$HOME/.nvm" && source "$NVM_DIR/nvm.sh"
+    npm run dev
+
+Или добавьте строки nvm в ~/.bashrc / ~/.zshrc для автоматической загрузки.
+Для WebStorm укажите Node interpreter:
+    /home/Nikita/.nvm/versions/node/v22.22.2/bin/node
+
+================================================================================
