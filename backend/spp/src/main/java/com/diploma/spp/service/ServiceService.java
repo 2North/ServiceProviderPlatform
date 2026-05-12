@@ -8,6 +8,9 @@ import com.diploma.spp.repository.CategoryRepository;
 import com.diploma.spp.repository.ServiceRepository;
 import com.diploma.spp.repository.SpecialistProfileRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,10 +25,10 @@ public class ServiceService {
     private final SpecialistProfileRepository specialistProfileRepository;
     private final CategoryRepository categoryRepository;
 
-    public List<ServiceDto> getAll() {
-        return serviceRepository.findByActiveTrue().stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+    public Page<ServiceDto> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return serviceRepository.findByActiveTrue(pageable)
+                .map(this::toDto);
     }
 
     public ServiceDto getById(Long id) {

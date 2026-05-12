@@ -4,6 +4,7 @@ import com.diploma.spp.dto.ServiceDto;
 import com.diploma.spp.service.ServiceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +19,11 @@ public class ServiceController {
     private final ServiceService serviceService;
 
     @GetMapping
-    public List<ServiceDto> getAll() {
-        return serviceService.getAll();
+    public Page<ServiceDto> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return serviceService.getAll(page, size);
     }
 
     @GetMapping("/{id}")
