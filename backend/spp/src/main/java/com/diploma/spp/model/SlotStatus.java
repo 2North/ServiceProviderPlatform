@@ -4,5 +4,5 @@ public enum SlotStatus {
     AVAILABLE,
     RESERVED,
     BOOKED,
-    CANCELED
+    CANCELLED
 }
