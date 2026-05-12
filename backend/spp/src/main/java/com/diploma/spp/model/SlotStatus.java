@@ -1,7 +1,7 @@
 package com.diploma.spp.model;
 
 public enum SlotStatus {
-    AVALIABLE,
+    AVAILABLE,
     RESERVED,
     BOOKED,
     CANCELED

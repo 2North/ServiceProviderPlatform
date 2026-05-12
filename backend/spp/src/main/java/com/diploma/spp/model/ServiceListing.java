@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Service {
+public class ServiceListing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;

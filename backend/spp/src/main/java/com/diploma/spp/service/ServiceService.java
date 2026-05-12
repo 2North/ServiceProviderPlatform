@@ -2,6 +2,7 @@ package com.diploma.spp.service;
 
 import com.diploma.spp.dto.ServiceDto;
 import com.diploma.spp.model.Category;
+import com.diploma.spp.model.ServiceListing;
 import com.diploma.spp.model.SpecialistProfile;
 import com.diploma.spp.repository.CategoryRepository;
 import com.diploma.spp.repository.ServiceRepository;
@@ -28,9 +29,9 @@ public class ServiceService {
     }
 
     public ServiceDto getById(Long id) {
-        com.diploma.spp.model.Service service = serviceRepository.findById(id)
+        ServiceListing serviceListing = serviceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Service not found: " + id));
-        return toDto(service);
+        return toDto(serviceListing);
     }
 
     public List<ServiceDto> getBySpecialist(Long specialistId) {
@@ -52,7 +53,7 @@ public class ServiceService {
         Category category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found: " + dto.getCategoryId()));
 
-        com.diploma.spp.model.Service service = com.diploma.spp.model.Service.builder()
+        ServiceListing serviceListing = ServiceListing.builder()
                 .specialistProfile(specialistProfile)
                 .category(category)
                 .title(dto.getTitle())
@@ -64,40 +65,40 @@ public class ServiceService {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        com.diploma.spp.model.Service saved = serviceRepository.save(service);
+        ServiceListing saved = serviceRepository.save(serviceListing);
         return toDto(saved);
     }
 
     public ServiceDto update(Long id, ServiceDto dto) {
-        com.diploma.spp.model.Service service = serviceRepository.findById(id)
+        ServiceListing serviceListing = serviceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Service not found: " + id));
 
-        service.setTitle(dto.getTitle());
-        service.setDescription(dto.getDescription());
-        service.setPrice(dto.getPrice());
-        service.setDuration(dto.getDuration());
-        service.setUpdatedAt(LocalDateTime.now());
+        serviceListing.setTitle(dto.getTitle());
+        serviceListing.setDescription(dto.getDescription());
+        serviceListing.setPrice(dto.getPrice());
+        serviceListing.setDuration(dto.getDuration());
+        serviceListing.setUpdatedAt(LocalDateTime.now());
 
-        com.diploma.spp.model.Service updated = serviceRepository.save(service);
+        ServiceListing updated = serviceRepository.save(serviceListing);
         return toDto(updated);
     }
 
     public void delete(Long id) {
-        com.diploma.spp.model.Service service = serviceRepository.findById(id)
+        ServiceListing serviceListing = serviceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Service not found: " + id));
-        serviceRepository.delete(service);
+        serviceRepository.delete(serviceListing);
     }
 
-    private ServiceDto toDto(com.diploma.spp.model.Service service) {
+    private ServiceDto toDto(ServiceListing serviceListing) {
         return ServiceDto.builder()
-                .id(service.getId())
-                .title(service.getTitle())
-                .description(service.getDescription())
-                .price(service.getPrice())
-                .duration(service.getDuration())
-                .active(service.isActive())
-                .categoryId(service.getCategory().getId())
-                .specialistProfileId(service.getSpecialistProfile().getId())
+                .id(serviceListing.getId())
+                .title(serviceListing.getTitle())
+                .description(serviceListing.getDescription())
+                .price(serviceListing.getPrice())
+                .duration(serviceListing.getDuration())
+                .active(serviceListing.isActive())
+                .categoryId(serviceListing.getCategory().getId())
+                .specialistProfileId(serviceListing.getSpecialistProfile().getId())
                 .build();
     }
 }
