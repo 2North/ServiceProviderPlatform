@@ -107,6 +107,27 @@ function Navbar() {
                 </Link>
               )}
 
+              <Link
+                to="/orders"
+                style={{
+                  color: '#a5b4fc',
+                  textDecoration: 'none',
+                  fontSize: 14,
+                  fontWeight: 500,
+                  padding: '6px 12px',
+                  borderRadius: 6,
+                  transition: 'background 0.2s',
+                }}
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.background = 'rgba(99,102,241,0.12)')
+                }
+                onMouseOut={(e) =>
+                  (e.currentTarget.style.background = 'transparent')
+                }
+              >
+                Доска заказов
+              </Link>
+
               {/* Email пользователя */}
               <span
                 style={{

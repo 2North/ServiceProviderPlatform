@@ -2,7 +2,7 @@ import client from './client.js'
 
 // Получить все услуги
 export const getAllServices = () =>
-  client.get('/services').then((r) => r.data)
+    client.get('/services').then((r) => r.data.content ?? r.data)
 
 // Получить услугу по ID
 export const getServiceById = (id) =>

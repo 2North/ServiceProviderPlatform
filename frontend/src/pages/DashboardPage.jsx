@@ -14,6 +14,9 @@ import {
   createSpecialist,
   updateSpecialist,
 } from '../api/specialists.js'
+import { createSlot, getAvailableSlots } from '../api/slots.js'
+import { getBookingsBySpecialist, updateBookingStatus } from '../api/bookings.js'
+import { getSpecialistAnalytics } from '../api/analytics.js'
 
 // ──────────────────────────────────────────────
 // Модальное окно подтверждения удаления
@@ -405,6 +408,41 @@ function ProfileForm({ specialist, onSuccess, onCancel }) {
 // ──────────────────────────────────────────────
 // Основная страница дашборда
 // ──────────────────────────────────────────────
+// ──────────────────────────────────────────────
+// Бейдж статуса слота
+// ──────────────────────────────────────────────
+function SlotStatusBadge({ status }) {
+  const map = {
+    AVAILABLE: { bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.3)', color: '#4ade80', label: 'Доступен' },
+    BOOKED: { bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.3)', color: '#fbbf24', label: 'Занят' },
+    CANCELLED: { bg: 'rgba(148,163,184,0.08)', border: 'rgba(148,163,184,0.15)', color: 'rgba(226,232,240,0.4)', label: 'Отменён' },
+  }
+  const s = map[status] || map.AVAILABLE
+  return (
+    <span style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 12, color: s.color, fontSize: 11, fontWeight: 600, padding: '2px 9px' }}>
+      {s.label}
+    </span>
+  )
+}
+
+// ──────────────────────────────────────────────
+// Бейдж статуса бронирования
+// ──────────────────────────────────────────────
+function BookingStatusBadge({ status }) {
+  const map = {
+    PENDING: { bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.3)', color: '#fbbf24', label: 'Ожидает' },
+    CONFIRMED: { bg: 'rgba(99,102,241,0.12)', border: 'rgba(99,102,241,0.3)', color: '#a5b4fc', label: 'Подтверждено' },
+    COMPLETED: { bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.3)', color: '#4ade80', label: 'Завершено' },
+    CANCELLED: { bg: 'rgba(148,163,184,0.08)', border: 'rgba(148,163,184,0.15)', color: 'rgba(226,232,240,0.4)', label: 'Отменено' },
+  }
+  const s = map[status] || map.PENDING
+  return (
+    <span style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 12, color: s.color, fontSize: 11, fontWeight: 600, padding: '2px 9px' }}>
+      {s.label}
+    </span>
+  )
+}
+
 function DashboardPage() {
   const qc = useQueryClient()
   const { specialistProfileId, setSpecialistProfileId } = useAuthStore()
@@ -414,6 +452,11 @@ function DashboardPage() {
   const [editingService, setEditingService] = useState(null)
   const [editingProfile, setEditingProfile] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState(null) // ID услуги к удалению
+
+  // Состояние слотов
+  const [showSlotForm, setShowSlotForm] = useState(false)
+  const [slotForm, setSlotForm] = useState({ slotDate: '', startTime: '', endTime: '' })
+  const [slotError, setSlotError] = useState('')
 
   // Загрузка профиля специалиста
   const {
@@ -454,6 +497,48 @@ function DashboardPage() {
       qc.invalidateQueries({ queryKey: ['specialist-services'] })
       setDeleteTarget(null)
     },
+  })
+
+  // ── Слоты ──
+  const { data: slots = [], isLoading: slotsLoading } = useQuery({
+    queryKey: ['specialist-slots', specialistProfileId],
+    queryFn: () => getAvailableSlots(specialistProfileId),
+    enabled: !!specialistProfileId,
+  })
+
+  const createSlotMut = useMutation({
+    mutationFn: createSlot,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['specialist-slots'] })
+      setShowSlotForm(false)
+      setSlotForm({ slotDate: '', startTime: '', endTime: '' })
+      setSlotError('')
+    },
+    onError: (err) => setSlotError(err.response?.data?.message || 'Ошибка при создании слота'),
+  })
+
+  const handleSlotSubmit = (e) => {
+    e.preventDefault()
+    createSlotMut.mutate({ specialistProfileId, ...slotForm })
+  }
+
+  // ── Бронирования ──
+  const { data: bookings = [], isLoading: bookingsLoading } = useQuery({
+    queryKey: ['specialist-bookings', specialistProfileId],
+    queryFn: () => getBookingsBySpecialist(specialistProfileId),
+    enabled: !!specialistProfileId,
+  })
+
+  const updateStatusMut = useMutation({
+    mutationFn: ({ bookingId, status }) => updateBookingStatus(bookingId, status),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['specialist-bookings'] }),
+  })
+
+  // ── Аналитика ──
+  const { data: analytics, isLoading: analyticsLoading } = useQuery({
+    queryKey: ['specialist-analytics', specialistProfileId],
+    queryFn: () => getSpecialistAnalytics(specialistProfileId),
+    enabled: !!specialistProfileId,
   })
 
   const sectionTitle = (text) => (
@@ -775,6 +860,152 @@ function DashboardPage() {
                     </div>
                   </div>
                 )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Мои слоты ── */}
+      <div className="card" style={{ padding: 28, marginTop: 32, position: 'relative', zIndex: 1 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+          {sectionTitle('Мои слоты')}
+          {!showSlotForm && (
+            <button className="btn-primary" onClick={() => setShowSlotForm(true)} style={{ fontSize: 13, padding: '8px 18px' }}>
+              + Добавить слот
+            </button>
+          )}
+        </div>
+
+        {showSlotForm && (
+          <form
+            onSubmit={handleSlotSubmit}
+            style={{ background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 24 }}
+          >
+            <h3 style={{ color: '#a5b4fc', margin: '0 0 4px', fontSize: 15, fontWeight: 600 }}>Новый слот</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>Дата</label>
+                <input type="date" value={slotForm.slotDate} onChange={e => setSlotForm(p => ({ ...p, slotDate: e.target.value }))} required />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>Начало</label>
+                <input type="time" value={slotForm.startTime} onChange={e => setSlotForm(p => ({ ...p, startTime: e.target.value }))} required />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>Конец</label>
+                <input type="time" value={slotForm.endTime} onChange={e => setSlotForm(p => ({ ...p, endTime: e.target.value }))} required />
+              </div>
+            </div>
+            {slotError && (
+              <div style={{ padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, color: '#f87171', fontSize: 13 }}>
+                {slotError}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button type="submit" className="btn-primary" disabled={createSlotMut.isPending} style={{ flex: 1, justifyContent: 'center' }}>
+                {createSlotMut.isPending ? 'Сохранение...' : 'Создать слот'}
+              </button>
+              <button type="button" className="btn-ghost" onClick={() => { setShowSlotForm(false); setSlotError('') }} style={{ fontSize: 13 }}>
+                Отмена
+              </button>
+            </div>
+          </form>
+        )}
+
+        {slotsLoading ? (
+          <p style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка слотов...</p>
+        ) : slots.length === 0 ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: 'rgba(226,232,240,0.35)', fontSize: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
+            Слоты ещё не добавлены
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {slots.map((slot) => (
+              <div key={slot.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, flexWrap: 'wrap', gap: 10 }}>
+                <span style={{ color: '#e2e8f0', fontSize: 14, fontWeight: 500 }}>{slot.slotDate}</span>
+                <span style={{ color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>{slot.startTime} — {slot.endTime}</span>
+                <SlotStatusBadge status={slot.status} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Мои заказы (бронирования) ── */}
+      <div className="card" style={{ padding: 28, marginTop: 32, position: 'relative', zIndex: 1 }}>
+        <div style={{ marginBottom: 20 }}>{sectionTitle('Мои бронирования')}</div>
+
+        {bookingsLoading ? (
+          <p style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка...</p>
+        ) : bookings.length === 0 ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: 'rgba(226,232,240,0.35)', fontSize: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
+            Нет бронирований
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {bookings.map((b) => (
+              <div key={b.id} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '16px 18px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, flexWrap: 'wrap', gap: 12 }}>
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                    <span style={{ color: 'rgba(226,232,240,0.4)', fontSize: 12 }}>#{b.id}</span>
+                    <BookingStatusBadge status={b.status} />
+                  </div>
+                  {b.note && <p style={{ color: 'rgba(226,232,240,0.6)', fontSize: 13, margin: '0 0 4px', lineHeight: 1.5 }}>{b.note}</p>}
+                  {b.createdAt && <span style={{ color: 'rgba(226,232,240,0.35)', fontSize: 12 }}>{b.createdAt}</span>}
+                </div>
+                {(b.status === 'PENDING' || b.status === 'CONFIRMED') && (
+                  <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                    {b.status === 'PENDING' && (
+                      <button
+                        className="btn-primary"
+                        onClick={() => updateStatusMut.mutate({ bookingId: b.id, status: 'CONFIRMED' })}
+                        disabled={updateStatusMut.isPending}
+                        style={{ fontSize: 13, padding: '7px 14px' }}
+                      >
+                        Подтвердить
+                      </button>
+                    )}
+                    {b.status === 'CONFIRMED' && (
+                      <button
+                        className="btn-ghost"
+                        onClick={() => updateStatusMut.mutate({ bookingId: b.id, status: 'COMPLETED' })}
+                        disabled={updateStatusMut.isPending}
+                        style={{ fontSize: 13, padding: '7px 14px', color: '#4ade80', borderColor: 'rgba(34,197,94,0.3)' }}
+                      >
+                        Завершить
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Аналитика ── */}
+      <div className="card" style={{ padding: 28, marginTop: 32, position: 'relative', zIndex: 1 }}>
+        <div style={{ marginBottom: 20 }}>{sectionTitle('Аналитика')}</div>
+
+        {analyticsLoading ? (
+          <p style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка...</p>
+        ) : !analytics ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: 'rgba(226,232,240,0.35)', fontSize: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
+            Данные аналитики недоступны
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 16 }}>
+            {[
+              { label: 'Всего бронирований', value: analytics.totalBookings ?? '—' },
+              { label: 'Завершено', value: analytics.completedBookings ?? '—', color: '#4ade80' },
+              { label: 'Отменено', value: analytics.cancelledBookings ?? '—', color: '#f87171' },
+              { label: 'Средний рейтинг', value: analytics.averageRating != null ? analytics.averageRating.toFixed(1) : '—', color: '#fbbf24' },
+              { label: 'Доход (MDL)', value: analytics.totalEarnings != null ? analytics.totalEarnings.toFixed(0) : '—', color: '#6ee7b7' },
+            ].map(({ label, value, color }) => (
+              <div key={label} style={{ padding: '20px 18px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <span style={{ color: 'rgba(226,232,240,0.45)', fontSize: 12, lineHeight: 1.4 }}>{label}</span>
+                <span style={{ color: color || '#f1f5f9', fontSize: 26, fontWeight: 700, letterSpacing: -0.5 }}>{value}</span>
               </div>
             ))}
           </div>

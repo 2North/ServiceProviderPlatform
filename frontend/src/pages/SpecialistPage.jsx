@@ -1,7 +1,10 @@
-import { useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '../store/useAuthStore.js'
 import { getSpecialistById } from '../api/specialists.js'
 import { getServicesBySpecialist } from '../api/services.js'
+import { getReviewsBySpecialist, createReview } from '../api/reviews.js'
 import ServiceCard from '../components/ServiceCard.jsx'
 
 // Звёзды рейтинга
@@ -71,8 +74,153 @@ function SpecialistSkeleton() {
   )
 }
 
+// ──────────────────────────────────────────────
+// Секция отзывов
+// ──────────────────────────────────────────────
+function ReviewsSection({ specialistId }) {
+  const qc = useQueryClient()
+  const { token, user } = useAuthStore()
+  const [form, setForm] = useState({ rating: '', text: '', bookingId: '' })
+  const [error, setError] = useState('')
+  const [showForm, setShowForm] = useState(false)
+
+  const { data: reviews = [], isLoading } = useQuery({
+    queryKey: ['specialist-reviews', specialistId],
+    queryFn: () => getReviewsBySpecialist(specialistId),
+    enabled: !!specialistId,
+  })
+
+  const mutation = useMutation({
+    mutationFn: createReview,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['specialist-reviews', specialistId] })
+      setForm({ rating: '', text: '', bookingId: '' })
+      setShowForm(false)
+      setError('')
+    },
+    onError: (err) => setError(err.response?.data?.message || 'Ошибка при отправке отзыва'),
+  })
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setError('')
+    mutation.mutate({
+      specialistId: parseInt(specialistId, 10),
+      clientId: user?.id,
+      rating: parseInt(form.rating, 10),
+      text: form.text,
+      ...(form.bookingId ? { bookingId: parseInt(form.bookingId, 10) } : {}),
+    })
+  }
+
+  const labelStyle = { display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }
+
+  return (
+    <div style={{ marginTop: 40, position: 'relative', zIndex: 1 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+        <h2 style={{ color: '#f1f5f9', fontSize: 20, fontWeight: 600, margin: 0, letterSpacing: -0.2 }}>
+          Отзывы
+          {reviews.length > 0 && (
+            <span style={{ marginLeft: 10, background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: 12, color: '#a5b4fc', fontSize: 13, fontWeight: 600, padding: '2px 10px' }}>
+              {reviews.length}
+            </span>
+          )}
+        </h2>
+        {token && user?.role === 'CLIENT' && !showForm && (
+          <button className="btn-ghost" onClick={() => setShowForm(true)} style={{ fontSize: 13, padding: '7px 16px' }}>
+            Оставить отзыв
+          </button>
+        )}
+      </div>
+
+      {showForm && (
+        <form onSubmit={handleSubmit} style={{ background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 24 }}>
+          <h3 style={{ color: '#a5b4fc', margin: '0 0 4px', fontSize: 15, fontWeight: 600 }}>Мой отзыв</h3>
+
+          <div>
+            <label style={labelStyle}>Оценка</label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {[1, 2, 3, 4, 5].map(n => (
+                <label key={n} style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <input
+                    type="radio"
+                    name="rating"
+                    value={n}
+                    checked={form.rating === String(n)}
+                    onChange={e => setForm(p => ({ ...p, rating: e.target.value }))}
+                    style={{ display: 'none' }}
+                  />
+                  <span style={{ fontSize: 28, color: form.rating >= String(n) ? '#fbbf24' : 'rgba(255,255,255,0.15)', transition: 'color 0.15s' }}>
+                    ★
+                  </span>
+                  <span style={{ fontSize: 11, color: 'rgba(226,232,240,0.4)' }}>{n}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Текст отзыва</label>
+            <textarea value={form.text} onChange={e => setForm(p => ({ ...p, text: e.target.value }))} placeholder="Поделитесь своим опытом..." rows={3} style={{ resize: 'vertical' }} required />
+          </div>
+
+          <div>
+            <label style={labelStyle}>ID бронирования (необязательно)</label>
+            <input type="number" value={form.bookingId} onChange={e => setForm(p => ({ ...p, bookingId: e.target.value }))} placeholder="Например: 42" />
+          </div>
+
+          {error && (
+            <div style={{ padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, color: '#f87171', fontSize: 13 }}>
+              {error}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button type="submit" className="btn-primary" disabled={mutation.isPending || !form.rating} style={{ flex: 1, justifyContent: 'center' }}>
+              {mutation.isPending ? 'Отправка...' : 'Отправить отзыв'}
+            </button>
+            <button type="button" className="btn-ghost" onClick={() => { setShowForm(false); setError('') }} style={{ fontSize: 13 }}>Отмена</button>
+          </div>
+        </form>
+      )}
+
+      {isLoading ? (
+        <p style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка отзывов...</p>
+      ) : reviews.length === 0 ? (
+        <div className="card" style={{ padding: '40px', textAlign: 'center', color: 'rgba(226,232,240,0.35)', fontSize: 14 }}>
+          Отзывов пока нет
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {reviews.map(review => (
+            <div key={review.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '18px 20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                <div style={{ display: 'flex', gap: 2 }}>
+                  {[1, 2, 3, 4, 5].map(s => (
+                    <span key={s} style={{ fontSize: 15, color: s <= review.rating ? '#fbbf24' : 'rgba(255,255,255,0.15)' }}>★</span>
+                  ))}
+                </div>
+                <span style={{ color: 'rgba(226,232,240,0.4)', fontSize: 12 }}>{review.rating}/5</span>
+              </div>
+              {review.text && <p style={{ color: 'rgba(226,232,240,0.75)', fontSize: 14, lineHeight: 1.6, margin: '0 0 8px' }}>{review.text}</p>}
+              {review.reply && (
+                <div style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)', borderRadius: 8, padding: '10px 14px', marginTop: 10 }}>
+                  <span style={{ color: '#a5b4fc', fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>Ответ специалиста</span>
+                  <p style={{ color: 'rgba(226,232,240,0.65)', fontSize: 13, margin: 0, lineHeight: 1.55 }}>{review.reply}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function SpecialistPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const { token, user } = useAuthStore()
 
   const { data: specialist, isLoading, error } = useQuery({
     queryKey: ['specialist', id],
@@ -197,6 +345,17 @@ function SpecialistPage() {
                 {specialist.bio}
               </p>
             )}
+
+            {/* Кнопка бронирования для клиентов */}
+            {token && user?.role === 'CLIENT' && (
+              <button
+                className="btn-primary"
+                onClick={() => navigate(`/book/${id}`)}
+                style={{ marginTop: 16, padding: '10px 24px', alignSelf: 'flex-start' }}
+              >
+                Забронировать
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -259,6 +418,9 @@ function SpecialistPage() {
           </div>
         )}
       </div>
+
+      {/* Отзывы */}
+      <ReviewsSection specialistId={id} />
     </div>
   )
 }
