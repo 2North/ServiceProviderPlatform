@@ -1,6 +1,8 @@
 package com.diploma.spp.service;
 
 import com.diploma.spp.dto.ServiceDto;
+import com.diploma.spp.exception.ForbiddenException;
+import com.diploma.spp.exception.ResourceNotFoundException;
 import com.diploma.spp.model.Category;
 import com.diploma.spp.model.ServiceListing;
 import com.diploma.spp.model.SpecialistProfile;
@@ -33,7 +35,7 @@ public class ServiceService {
 
     public ServiceDto getById(Long id) {
         ServiceListing serviceListing = serviceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Service not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Service not found: " + id));
         return toDto(serviceListing);
     }
 
@@ -51,10 +53,10 @@ public class ServiceService {
 
     public ServiceDto create(ServiceDto dto) {
         SpecialistProfile specialistProfile = specialistProfileRepository.findById(dto.getSpecialistProfileId())
-                .orElseThrow(() -> new RuntimeException("Specialist profile not found: " + dto.getSpecialistProfileId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Specialist profile not found: " + dto.getSpecialistProfileId()));
 
         Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found: " + dto.getCategoryId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found: " + dto.getCategoryId()));
 
         ServiceListing serviceListing = ServiceListing.builder()
                 .specialistProfile(specialistProfile)
@@ -74,7 +76,11 @@ public class ServiceService {
 
     public ServiceDto update(Long id, ServiceDto dto) {
         ServiceListing serviceListing = serviceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Service not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Service not found: " + id));
+
+        if (!serviceListing.getSpecialistProfile().getId().equals(dto.getSpecialistProfileId())) {
+            throw new ForbiddenException("You can only edit your own services");
+        }
 
         serviceListing.setTitle(dto.getTitle());
         serviceListing.setDescription(dto.getDescription());
@@ -86,9 +92,14 @@ public class ServiceService {
         return toDto(updated);
     }
 
-    public void delete(Long id) {
+    public void delete(Long id, Long specialistProfileId) {
         ServiceListing serviceListing = serviceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Service not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Service not found: " + id));
+
+        if (!serviceListing.getSpecialistProfile().getId().equals(specialistProfileId)) {
+            throw new ForbiddenException("You can only delete your own services");
+        }
+
         serviceRepository.delete(serviceListing);
     }
 

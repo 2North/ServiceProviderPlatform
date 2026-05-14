@@ -24,6 +24,9 @@ import { getSpecialistAnalytics } from '../api/analytics.js'
 function ConfirmModal({ message, onConfirm, onCancel }) {
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-modal-title"
       style={{
         position: 'fixed',
         inset: 0,
@@ -41,7 +44,7 @@ function ConfirmModal({ message, onConfirm, onCancel }) {
         style={{ padding: 28, maxWidth: 380, width: '100%' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <p style={{ color: '#e2e8f0', fontSize: 15, lineHeight: 1.55, margin: '0 0 20px' }}>
+        <p id="confirm-modal-title" style={{ color: '#e2e8f0', fontSize: 15, lineHeight: 1.55, margin: '0 0 20px' }}>
           {message}
         </p>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
@@ -120,18 +123,7 @@ function ServiceForm({ initial, categories, specialistProfileId, onSuccess, onCa
     }
   }
 
-  const fieldLabel = (text) => (
-    <label
-      style={{
-        display: 'block',
-        marginBottom: 6,
-        color: 'rgba(226,232,240,0.6)',
-        fontSize: 13,
-      }}
-    >
-      {text}
-    </label>
-  )
+  const labelStyle = { display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }
 
   return (
     <form
@@ -159,8 +151,9 @@ function ServiceForm({ initial, categories, specialistProfileId, onSuccess, onCa
       </h3>
 
       <div>
-        {fieldLabel('Название')}
+        <label htmlFor="sf-title" style={labelStyle}>Название</label>
         <input
+          id="sf-title"
           name="title"
           value={form.title}
           onChange={handleChange}
@@ -170,8 +163,9 @@ function ServiceForm({ initial, categories, specialistProfileId, onSuccess, onCa
       </div>
 
       <div>
-        {fieldLabel('Описание')}
+        <label htmlFor="sf-description" style={labelStyle}>Описание</label>
         <textarea
+          id="sf-description"
           name="description"
           value={form.description}
           onChange={handleChange}
@@ -183,8 +177,9 @@ function ServiceForm({ initial, categories, specialistProfileId, onSuccess, onCa
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
-          {fieldLabel('Цена (MDL)')}
+          <label htmlFor="sf-price" style={labelStyle}>Цена (MDL)</label>
           <input
+            id="sf-price"
             name="price"
             type="number"
             min="0"
@@ -196,8 +191,9 @@ function ServiceForm({ initial, categories, specialistProfileId, onSuccess, onCa
           />
         </div>
         <div>
-          {fieldLabel('Длительность (мин)')}
+          <label htmlFor="sf-duration" style={labelStyle}>Длительность (мин)</label>
           <input
+            id="sf-duration"
             name="duration"
             type="number"
             min="1"
@@ -210,8 +206,8 @@ function ServiceForm({ initial, categories, specialistProfileId, onSuccess, onCa
       </div>
 
       <div>
-        {fieldLabel('Категория')}
-        <select name="categoryId" value={form.categoryId} onChange={handleChange} required>
+        <label htmlFor="sf-category" style={labelStyle}>Категория</label>
+        <select id="sf-category" name="categoryId" value={form.categoryId} onChange={handleChange} required>
           <option value="">— Выберите категорию —</option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
@@ -244,6 +240,7 @@ function ServiceForm({ initial, categories, specialistProfileId, onSuccess, onCa
 
       {error && (
         <div
+          role="alert"
           style={{
             padding: '10px 14px',
             background: 'rgba(239,68,68,0.1)',
@@ -347,10 +344,11 @@ function ProfileForm({ specialist, onSuccess, onCancel }) {
       }}
     >
       <div>
-        <label style={{ display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>
+        <label htmlFor="pf-bio" style={{ display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>
           О себе (bio)
         </label>
         <textarea
+          id="pf-bio"
           name="bio"
           value={form.bio}
           onChange={handleChange}
@@ -360,10 +358,11 @@ function ProfileForm({ specialist, onSuccess, onCancel }) {
         />
       </div>
       <div>
-        <label style={{ display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>
+        <label htmlFor="pf-experience" style={{ display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>
           Опыт (лет)
         </label>
         <input
+          id="pf-experience"
           name="experience"
           type="number"
           min="0"
@@ -375,6 +374,7 @@ function ProfileForm({ specialist, onSuccess, onCancel }) {
 
       {error && (
         <div
+          role="alert"
           style={{
             padding: '10px 14px',
             background: 'rgba(239,68,68,0.1)',
@@ -492,7 +492,7 @@ function DashboardPage() {
 
   // Мутация удаления
   const deleteMut = useMutation({
-    mutationFn: deleteService,
+    mutationFn: (id) => deleteService(id, specialistProfileId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['specialist-services'] })
       setDeleteTarget(null)
@@ -560,8 +560,8 @@ function DashboardPage() {
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 24px', position: 'relative' }}>
-      {/* Декоративный glow */}
       <div
+        aria-hidden="true"
         style={{
           position: 'fixed',
           top: '30%',
@@ -614,7 +614,7 @@ function DashboardPage() {
         </div>
 
         {profileLoading ? (
-          <p style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка...</p>
+          <p role="status" style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка...</p>
         ) : profileError || !specialist ? (
           !editingProfile && (
             <div
@@ -751,7 +751,7 @@ function DashboardPage() {
 
         {/* Список услуг */}
         {servicesLoading ? (
-          <p style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка услуг...</p>
+          <p role="status" style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка услуг...</p>
         ) : services.length === 0 && !showServiceForm ? (
           <div
             style={{
@@ -885,20 +885,20 @@ function DashboardPage() {
             <h3 style={{ color: '#a5b4fc', margin: '0 0 4px', fontSize: 15, fontWeight: 600 }}>Новый слот</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>Дата</label>
-                <input type="date" value={slotForm.slotDate} onChange={e => setSlotForm(p => ({ ...p, slotDate: e.target.value }))} required />
+                <label htmlFor="slot-date" style={{ display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>Дата</label>
+                <input id="slot-date" type="date" value={slotForm.slotDate} onChange={e => setSlotForm(p => ({ ...p, slotDate: e.target.value }))} required />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>Начало</label>
-                <input type="time" value={slotForm.startTime} onChange={e => setSlotForm(p => ({ ...p, startTime: e.target.value }))} required />
+                <label htmlFor="slot-start" style={{ display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>Начало</label>
+                <input id="slot-start" type="time" value={slotForm.startTime} onChange={e => setSlotForm(p => ({ ...p, startTime: e.target.value }))} required />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>Конец</label>
-                <input type="time" value={slotForm.endTime} onChange={e => setSlotForm(p => ({ ...p, endTime: e.target.value }))} required />
+                <label htmlFor="slot-end" style={{ display: 'block', marginBottom: 6, color: 'rgba(226,232,240,0.6)', fontSize: 13 }}>Конец</label>
+                <input id="slot-end" type="time" value={slotForm.endTime} onChange={e => setSlotForm(p => ({ ...p, endTime: e.target.value }))} required />
               </div>
             </div>
             {slotError && (
-              <div style={{ padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, color: '#f87171', fontSize: 13 }}>
+              <div role="alert" style={{ padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, color: '#f87171', fontSize: 13 }}>
                 {slotError}
               </div>
             )}
@@ -914,7 +914,7 @@ function DashboardPage() {
         )}
 
         {slotsLoading ? (
-          <p style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка слотов...</p>
+          <p role="status" style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка слотов...</p>
         ) : slots.length === 0 ? (
           <div style={{ padding: '40px', textAlign: 'center', color: 'rgba(226,232,240,0.35)', fontSize: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
             Слоты ещё не добавлены
@@ -937,7 +937,7 @@ function DashboardPage() {
         <div style={{ marginBottom: 20 }}>{sectionTitle('Мои бронирования')}</div>
 
         {bookingsLoading ? (
-          <p style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка...</p>
+          <p role="status" style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка...</p>
         ) : bookings.length === 0 ? (
           <div style={{ padding: '40px', textAlign: 'center', color: 'rgba(226,232,240,0.35)', fontSize: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
             Нет бронирований
@@ -989,7 +989,7 @@ function DashboardPage() {
         <div style={{ marginBottom: 20 }}>{sectionTitle('Аналитика')}</div>
 
         {analyticsLoading ? (
-          <p style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка...</p>
+          <p role="status" style={{ color: 'rgba(226,232,240,0.4)', fontSize: 14 }}>Загрузка...</p>
         ) : !analytics ? (
           <div style={{ padding: '40px', textAlign: 'center', color: 'rgba(226,232,240,0.35)', fontSize: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
             Данные аналитики недоступны

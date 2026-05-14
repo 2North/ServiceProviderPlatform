@@ -2,6 +2,8 @@ package com.diploma.spp.service;
 
 import com.diploma.spp.dto.OrderDto;
 import com.diploma.spp.dto.OrderResponseDto;
+import com.diploma.spp.exception.ConflictException;
+import com.diploma.spp.exception.ResourceNotFoundException;
 import com.diploma.spp.model.*;
 import com.diploma.spp.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +25,10 @@ public class OrderService {
 
     public OrderDto create(OrderDto dto) {
         User client = userRepository.findById(dto.getClientId())
-                .orElseThrow(() -> new RuntimeException("Client not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
 
         Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
         Order order = Order.builder()
                 .client(client)
@@ -60,14 +62,14 @@ public class OrderService {
     @Transactional
     public OrderResponseDto respond(OrderResponseDto dto) {
         Order order = orderRepository.findById(dto.getOrderId())
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
         if (order.getStatus() != OrderStatus.OPEN) {
-            throw new RuntimeException("Order is not open for responses");
+            throw new ConflictException("Order is not open for responses");
         }
 
         SpecialistProfile specialist = specialistProfileRepository.findById(dto.getSpecialistId())
-                .orElseThrow(() -> new RuntimeException("Specialist not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Specialist not found"));
 
         OrderResponse response = OrderResponse.builder()
                 .order(order)
@@ -92,7 +94,7 @@ public class OrderService {
     @Transactional
     public OrderResponseDto acceptResponse(Long responseId) {
         OrderResponse response = orderResponseRepository.findById(responseId)
-                .orElseThrow(() -> new RuntimeException("Response not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Response not found"));
 
         response.setStatus(ResponseStatus.ACCEPTED);
         response.setUpdatedAt(LocalDateTime.now());

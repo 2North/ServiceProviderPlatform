@@ -57,7 +57,7 @@ public class ServiceController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('SPECIALIST')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
-        serviceService.delete(id);
+    public void delete(@PathVariable Long id, @RequestParam Long specialistProfileId) {
+        serviceService.delete(id, specialistProfileId);
     }
 }

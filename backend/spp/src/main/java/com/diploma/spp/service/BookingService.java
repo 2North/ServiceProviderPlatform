@@ -1,6 +1,8 @@
 package com.diploma.spp.service;
 
 import com.diploma.spp.dto.BookingDto;
+import com.diploma.spp.exception.ConflictException;
+import com.diploma.spp.exception.ResourceNotFoundException;
 import com.diploma.spp.model.Booking;
 import com.diploma.spp.model.BookingStatus;
 import com.diploma.spp.model.ServiceListing;
@@ -30,16 +32,16 @@ public class BookingService {
     @Transactional
     public BookingDto create(BookingDto dto) {
         User client = userRepository.findById(dto.getClientId())
-                .orElseThrow(() -> new RuntimeException("Client not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
 
         ServiceListing serviceListing = serviceRepository.findById(dto.getServiceId())
-                .orElseThrow(() -> new RuntimeException("Service not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
 
         TimeSlot slot = timeSlotRepository.findById(dto.getTimeSlotId())
-                .orElseThrow(() -> new RuntimeException("Time slot not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Time slot not found"));
 
         if (slot.getStatus() != SlotStatus.AVAILABLE) {
-            throw new RuntimeException("Time slot is not available");
+            throw new ConflictException("Time slot is not available");
         }
 
         slot.setStatus(SlotStatus.BOOKED);
@@ -76,7 +78,7 @@ public class BookingService {
     @Transactional
     public BookingDto updateStatus(Long bookingId, BookingStatus status) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
         booking.setStatus(status);
         booking.setUpdatedAt(LocalDateTime.now());

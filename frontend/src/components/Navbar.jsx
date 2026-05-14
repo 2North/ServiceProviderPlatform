@@ -35,6 +35,7 @@ function Navbar() {
         {/* Логотип */}
         <Link
           to="/"
+          aria-label="ServicePort — на главную"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -42,8 +43,8 @@ function Navbar() {
             textDecoration: 'none',
           }}
         >
-          {/* Индиго квадрат-логомарк */}
           <div
+            aria-hidden="true"
             style={{
               width: 32,
               height: 32,
@@ -56,9 +57,7 @@ function Navbar() {
               flexShrink: 0,
             }}
           >
-            <span
-              style={{ color: '#fff', fontWeight: 800, fontSize: 15, letterSpacing: -0.5 }}
-            >
+            <span style={{ color: '#fff', fontWeight: 800, fontSize: 15, letterSpacing: -0.5 }}>
               S
             </span>
           </div>
@@ -77,10 +76,12 @@ function Navbar() {
         {/* Правая часть */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {!token ? (
-            <Link to="/auth">
-              <button className="btn-primary" style={{ padding: '8px 20px', fontSize: 14 }}>
-                Войти
-              </button>
+            <Link
+              to="/auth"
+              className="btn-primary"
+              style={{ padding: '8px 20px', fontSize: 14, textDecoration: 'none' }}
+            >
+              Войти
             </Link>
           ) : (
             <>

@@ -1,6 +1,8 @@
 package com.diploma.spp.service;
 
 import com.diploma.spp.dto.ReviewDto;
+import com.diploma.spp.exception.ConflictException;
+import com.diploma.spp.exception.ResourceNotFoundException;
 import com.diploma.spp.model.*;
 import com.diploma.spp.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -24,21 +26,21 @@ public class ReviewService {
     @Transactional
     public ReviewDto create(ReviewDto dto) {
         Booking booking = bookingRepository.findById(dto.getBookingId())
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
         if (booking.getStatus() != BookingStatus.COMPLETED) {
-            throw new RuntimeException("Review can only be left for completed bookings");
+            throw new IllegalArgumentException("Review can only be left for completed bookings");
         }
 
         if (reviewRepository.findByBooking_Id(dto.getBookingId()).isPresent()) {
-            throw new RuntimeException("Review already exists for this booking");
+            throw new ConflictException("Review already exists for this booking");
         }
 
         User client = userRepository.findById(dto.getClientId())
-                .orElseThrow(() -> new RuntimeException("Client not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
 
         SpecialistProfile specialist = specialistProfileRepository.findById(dto.getSpecialistId())
-                .orElseThrow(() -> new RuntimeException("Specialist not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Specialist not found"));
 
         Review review = Review.builder()
                 .booking(booking)
@@ -67,7 +69,7 @@ public class ReviewService {
     @Transactional
     public ReviewDto addReply(Long reviewId, String reply) {
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new RuntimeException("Review not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
 
         review.setReply(reply);
         review.setUpdatedAt(LocalDateTime.now());

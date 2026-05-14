@@ -1,6 +1,7 @@
 package com.diploma.spp.service;
 
 import com.diploma.spp.dto.SpecialistProfileDto;
+import com.diploma.spp.exception.ResourceNotFoundException;
 import com.diploma.spp.model.SpecialistProfile;
 import com.diploma.spp.model.User;
 import com.diploma.spp.repository.SpecialistProfileRepository;
@@ -20,19 +21,19 @@ public class SpecialistProfileService {
 
     public SpecialistProfileDto getById(Long id) {
         SpecialistProfile profile = specialistProfileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Specialist profile not found:" + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Specialist profile not found: " + id));
         return toDto(profile);
     }
 
     public SpecialistProfileDto getByUserId(Long userId) {
         SpecialistProfile profile = specialistProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Specialist profile not found:" + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Specialist profile not found for user: " + userId));
         return toDto(profile);
     }
 
     public SpecialistProfileDto create(SpecialistProfileDto dto) {
         User user = userRepository.findByEmail(dto.getUserEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + dto.getUserEmail()));
 
         SpecialistProfile profile = SpecialistProfile.builder()
                 .user(user)
@@ -50,7 +51,7 @@ public class SpecialistProfileService {
 
     public SpecialistProfileDto update(Long id, SpecialistProfileDto dto) {
         SpecialistProfile profile = specialistProfileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Specialist profile not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Specialist profile not found: " + id));
 
         profile.setBio(dto.getBio());
         profile.setExperience(dto.getExperience());

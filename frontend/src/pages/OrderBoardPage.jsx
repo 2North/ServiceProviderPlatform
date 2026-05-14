@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '../store/useAuthStore.js'
+import { getMe } from '../api/auth.js'
 import { getAllCategories } from '../api/categories.js'
 import { getOpenOrders, createOrder, respondToOrder } from '../api/orders.js'
+import { getSpecialistByUserId } from '../api/specialists.js'
 
 // ──────────────────────────────────────────────
 // Форма создания заказа (CLIENT)
@@ -44,36 +46,36 @@ function CreateOrderForm({ categories, clientId, onSuccess, onCancel }) {
       <h3 style={{ color: '#a5b4fc', margin: '0 0 4px', fontSize: 15, fontWeight: 600 }}>Новый заказ</h3>
 
       <div>
-        <label style={labelStyle}>Заголовок</label>
-        <input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} placeholder="Кратко опишите задачу" required />
+        <label htmlFor="order-title" style={labelStyle}>Заголовок</label>
+        <input id="order-title" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} placeholder="Кратко опишите задачу" required />
       </div>
 
       <div>
-        <label style={labelStyle}>Описание</label>
-        <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Подробное описание задачи..." rows={3} style={{ resize: 'vertical' }} />
+        <label htmlFor="order-description" style={labelStyle}>Описание</label>
+        <textarea id="order-description" value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Подробное описание задачи..." rows={3} style={{ resize: 'vertical' }} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
-          <label style={labelStyle}>Бюджет (MDL)</label>
-          <input type="number" min="0" step="0.01" value={form.budget} onChange={e => setForm(p => ({ ...p, budget: e.target.value }))} placeholder="0.00" required />
+          <label htmlFor="order-budget" style={labelStyle}>Бюджет (MDL)</label>
+          <input id="order-budget" type="number" min="0" step="0.01" value={form.budget} onChange={e => setForm(p => ({ ...p, budget: e.target.value }))} placeholder="0.00" required />
         </div>
         <div>
-          <label style={labelStyle}>Желаемая дата</label>
-          <input type="date" value={form.desiredDate} onChange={e => setForm(p => ({ ...p, desiredDate: e.target.value }))} />
+          <label htmlFor="order-date" style={labelStyle}>Желаемая дата</label>
+          <input id="order-date" type="date" value={form.desiredDate} onChange={e => setForm(p => ({ ...p, desiredDate: e.target.value }))} />
         </div>
       </div>
 
       <div>
-        <label style={labelStyle}>Категория</label>
-        <select value={form.categoryId} onChange={e => setForm(p => ({ ...p, categoryId: e.target.value }))} required>
+        <label htmlFor="order-category" style={labelStyle}>Категория</label>
+        <select id="order-category" value={form.categoryId} onChange={e => setForm(p => ({ ...p, categoryId: e.target.value }))} required>
           <option value="">— Выберите категорию —</option>
           {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
       </div>
 
       {error && (
-        <div style={{ padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, color: '#f87171', fontSize: 13 }}>
+        <div role="alert" style={{ padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, color: '#f87171', fontSize: 13 }}>
           {error}
         </div>
       )}
@@ -121,18 +123,18 @@ function RespondForm({ orderId, specialistId, onSuccess, onCancel }) {
     >
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
-          <label style={labelStyle}>Предлагаемая цена (MDL)</label>
-          <input type="number" min="0" step="0.01" value={form.proposedPrice} onChange={e => setForm(p => ({ ...p, proposedPrice: e.target.value }))} placeholder="0.00" required />
+          <label htmlFor={`respond-price-${orderId}`} style={labelStyle}>Предлагаемая цена (MDL)</label>
+          <input id={`respond-price-${orderId}`} type="number" min="0" step="0.01" value={form.proposedPrice} onChange={e => setForm(p => ({ ...p, proposedPrice: e.target.value }))} placeholder="0.00" required />
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-end' }}>
           <div style={{ width: '100%' }}>
-            <label style={labelStyle}>Сообщение</label>
-            <input value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))} placeholder="Кратко о себе..." />
+            <label htmlFor={`respond-message-${orderId}`} style={labelStyle}>Сообщение</label>
+            <input id={`respond-message-${orderId}`} value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))} placeholder="Кратко о себе..." />
           </div>
         </div>
       </div>
       {error && (
-        <div style={{ padding: '8px 12px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, color: '#f87171', fontSize: 13 }}>
+        <div role="alert" style={{ padding: '8px 12px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, color: '#f87171', fontSize: 13 }}>
           {error}
         </div>
       )}
@@ -200,8 +202,20 @@ function OrderCard({ order, categories, role, specialistProfileId }) {
 // Главная страница
 // ──────────────────────────────────────────────
 function OrderBoardPage() {
-  const { user, specialistProfileId } = useAuthStore()
+  const { user, token } = useAuthStore()
   const [showCreateForm, setShowCreateForm] = useState(false)
+
+  const { data: me } = useQuery({
+    queryKey: ['me'],
+    queryFn: getMe,
+    enabled: !!token,
+  })
+
+  const { data: myProfile } = useQuery({
+    queryKey: ['my-profile', me?.id],
+    queryFn: () => getSpecialistByUserId(me.id),
+    enabled: !!me?.id && user?.role === 'SPECIALIST',
+  })
 
   const { data: orders = [], isLoading: ordersLoading } = useQuery({
     queryKey: ['open-orders'],
@@ -215,8 +229,8 @@ function OrderBoardPage() {
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 24px', position: 'relative' }}>
-      {/* Декоративный glow */}
       <div
+        aria-hidden="true"
         style={{
           position: 'fixed',
           top: '30%',
@@ -251,7 +265,7 @@ function OrderBoardPage() {
         {showCreateForm && (
           <CreateOrderForm
             categories={categories}
-            clientId={user?.id}
+            clientId={me?.id}
             onSuccess={() => setShowCreateForm(false)}
             onCancel={() => setShowCreateForm(false)}
           />
@@ -276,7 +290,7 @@ function OrderBoardPage() {
                 order={order}
                 categories={categories}
                 role={user?.role}
-                specialistProfileId={specialistProfileId}
+                specialistProfileId={myProfile?.id}
               />
             ))}
           </div>

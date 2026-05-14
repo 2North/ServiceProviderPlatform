@@ -23,5 +23,7 @@ server:
 
 app:
   jwt:
-    secret: dGhpcy1pcy1hLXZlcnktbG9uZy1zZWNyZXQta2V5LWZvci1zaWduaW5nLWp3dC10b2tlbnMtaW4tc3BwLWFwcA==
+    secret: ${JWT_SECRET:dGhpcy1pcy1hLXZlcnktbG9uZy1zZWNyZXQta2V5LWZvci1zaWduaW5nLWp3dC10b2tlbnMtaW4tc3BwLWFwcA==}
     expiration: 86400000
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}

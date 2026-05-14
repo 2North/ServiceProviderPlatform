@@ -3,6 +3,8 @@ package com.diploma.spp.service;
 import com.diploma.spp.dto.AuthRequest;
 import com.diploma.spp.dto.AuthResponse;
 import com.diploma.spp.dto.RegisterRequest;
+import com.diploma.spp.exception.ConflictException;
+import com.diploma.spp.exception.ResourceNotFoundException;
 import com.diploma.spp.model.Role;
 import com.diploma.spp.model.User;
 import com.diploma.spp.repository.UserRepository;
@@ -25,9 +27,13 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public AuthResponse register(RegisterRequest registerRequest){
-        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {//Doubling mail prevention
-            throw new RuntimeException("Email already exists");
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
+            throw new ConflictException("Email already exists");
         }
+
+        Role role = (registerRequest.getRole() != null && registerRequest.getRole().equals("SPECIALIST"))
+                ? Role.SPECIALIST
+                : Role.CLIENT;
 
         User user = User.builder()
                 .email(registerRequest.getEmail())
@@ -35,7 +41,7 @@ public class AuthService {
                 .firstName(registerRequest.getFirstName())
                 .lastName(registerRequest.getLastName())
                 .phone(registerRequest.getPhone())
-                .role(Role.CLIENT)
+                .role(role)
                 .enabled(true)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -55,7 +61,7 @@ public class AuthService {
                 )
         );
         User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(
-                () -> new RuntimeException("User not found"));
+                () -> new ResourceNotFoundException("User not found"));
         return AuthResponse.builder()
                 .email(user.getEmail())
                 .token(jwtUtils.generateToken(user.getEmail(), user.getRole().name()))

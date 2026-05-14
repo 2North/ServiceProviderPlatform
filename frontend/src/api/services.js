@@ -25,5 +25,5 @@ export const updateService = (id, data) =>
   client.put(`/services/${id}`, data).then((r) => r.data)
 
 // Удалить услугу (только SPECIALIST)
-export const deleteService = (id) =>
-  client.delete(`/services/${id}`)
+export const deleteService = (id, specialistProfileId) =>
+  client.delete(`/services/${id}`, { params: { specialistProfileId } })

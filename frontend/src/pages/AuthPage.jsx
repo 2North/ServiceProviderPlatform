@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { login, register } from '../api/auth.js'
+import { login, register, getMe } from '../api/auth.js'
+import { getSpecialistByUserId } from '../api/specialists.js'
 import { useAuthStore } from '../store/useAuthStore.js'
 
 // Фоновый декоративный blob
@@ -20,7 +21,7 @@ function GlowBlob({ style }) {
 
 function AuthPage() {
   const navigate = useNavigate()
-  const { setAuth } = useAuthStore()
+  const { setAuth, setSpecialistProfileId } = useAuthStore()
 
   // Текущая вкладка: 'login' или 'register'
   const [tab, setTab] = useState('login')
@@ -43,39 +44,39 @@ function AuthPage() {
     setErrorMsg('')
   }
 
+  const handleAuthSuccess = async (data) => {
+    setAuth(data.token, { email: data.email, role: data.role })
+    if (data.role === 'SPECIALIST') {
+      try {
+        const me = await getMe()
+        const profile = await getSpecialistByUserId(me.id)
+        if (profile?.id) {
+          setSpecialistProfileId(profile.id)
+        }
+      } catch (e) {
+        // Профиль ещё не создан — нормально для новых специалистов
+      }
+      navigate('/dashboard')
+    } else {
+      navigate('/')
+    }
+  }
+
   // Мутация входа
   const loginMutation = useMutation({
     mutationFn: login,
-    onSuccess: (data) => {
-      setAuth(data.token, { email: data.email, role: data.role })
-      if (data.role === 'SPECIALIST') {
-        navigate('/dashboard')
-      } else {
-        navigate('/')
-      }
-    },
+    onSuccess: handleAuthSuccess,
     onError: (err) => {
-      setErrorMsg(
-        err.response?.data?.message || 'Неверный email или пароль'
-      )
+      setErrorMsg(err.response?.data?.message || 'Неверный email или пароль')
     },
   })
 
   // Мутация регистрации
   const registerMutation = useMutation({
     mutationFn: register,
-    onSuccess: (data) => {
-      setAuth(data.token, { email: data.email, role: data.role })
-      if (data.role === 'SPECIALIST') {
-        navigate('/dashboard')
-      } else {
-        navigate('/')
-      }
-    },
+    onSuccess: handleAuthSuccess,
     onError: (err) => {
-      setErrorMsg(
-        err.response?.data?.message || 'Ошибка регистрации. Попробуйте снова.'
-      )
+      setErrorMsg(err.response?.data?.message || 'Ошибка регистрации. Попробуйте снова.')
     },
   })
 
@@ -92,6 +93,7 @@ function AuthPage() {
         lastName: form.lastName,
         email: form.email,
         password: form.password,
+        role: selectedRole,
       })
     }
   }

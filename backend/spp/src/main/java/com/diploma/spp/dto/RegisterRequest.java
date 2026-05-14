@@ -2,6 +2,7 @@ package com.diploma.spp.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,4 +27,7 @@ public class RegisterRequest {
     String lastName;
 
     String phone;
+
+    @Pattern(regexp = "CLIENT|SPECIALIST", message = "Role must be CLIENT or SPECIALIST")
+    String role;
 }

@@ -2,6 +2,8 @@
 function CategoryFilter({ categories, selected, onSelect }) {
   return (
     <div
+      role="group"
+      aria-label="Фильтр по категориям"
       style={{
         display: 'flex',
         gap: 8,
@@ -9,9 +11,9 @@ function CategoryFilter({ categories, selected, onSelect }) {
         marginBottom: 28,
       }}
     >
-      {/* Кнопка "Все" */}
       <button
         onClick={() => onSelect(null)}
+        aria-pressed={selected === null}
         style={{
           padding: '7px 18px',
           borderRadius: 20,
@@ -32,13 +34,13 @@ function CategoryFilter({ categories, selected, onSelect }) {
         Все
       </button>
 
-      {/* Категории */}
       {categories.map((cat) => {
         const isActive = selected === cat.id
         return (
           <button
             key={cat.id}
             onClick={() => onSelect(cat.id)}
+            aria-pressed={isActive}
             style={{
               padding: '7px 18px',
               borderRadius: 20,

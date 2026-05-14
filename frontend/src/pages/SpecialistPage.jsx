@@ -139,38 +139,39 @@ function ReviewsSection({ specialistId }) {
 
           <div>
             <label style={labelStyle}>Оценка</label>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div role="radiogroup" aria-label="Оценка от 1 до 5" style={{ display: 'flex', gap: 8 }}>
               {[1, 2, 3, 4, 5].map(n => (
                 <label key={n} style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                   <input
+                    className="sr-only"
                     type="radio"
                     name="rating"
                     value={n}
+                    aria-label={`${n} ${n === 1 ? 'звезда' : n < 5 ? 'звезды' : 'звёзд'}`}
                     checked={form.rating === String(n)}
                     onChange={e => setForm(p => ({ ...p, rating: e.target.value }))}
-                    style={{ display: 'none' }}
                   />
-                  <span style={{ fontSize: 28, color: form.rating >= String(n) ? '#fbbf24' : 'rgba(255,255,255,0.15)', transition: 'color 0.15s' }}>
+                  <span aria-hidden="true" style={{ fontSize: 28, color: form.rating >= String(n) ? '#fbbf24' : 'rgba(255,255,255,0.15)', transition: 'color 0.15s' }}>
                     ★
                   </span>
-                  <span style={{ fontSize: 11, color: 'rgba(226,232,240,0.4)' }}>{n}</span>
+                  <span aria-hidden="true" style={{ fontSize: 11, color: 'rgba(226,232,240,0.4)' }}>{n}</span>
                 </label>
               ))}
             </div>
           </div>
 
           <div>
-            <label style={labelStyle}>Текст отзыва</label>
-            <textarea value={form.text} onChange={e => setForm(p => ({ ...p, text: e.target.value }))} placeholder="Поделитесь своим опытом..." rows={3} style={{ resize: 'vertical' }} required />
+            <label htmlFor="review-text" style={labelStyle}>Текст отзыва</label>
+            <textarea id="review-text" value={form.text} onChange={e => setForm(p => ({ ...p, text: e.target.value }))} placeholder="Поделитесь своим опытом..." rows={3} style={{ resize: 'vertical' }} required />
           </div>
 
           <div>
-            <label style={labelStyle}>ID бронирования (необязательно)</label>
-            <input type="number" value={form.bookingId} onChange={e => setForm(p => ({ ...p, bookingId: e.target.value }))} placeholder="Например: 42" />
+            <label htmlFor="review-booking-id" style={labelStyle}>ID бронирования (необязательно)</label>
+            <input id="review-booking-id" type="number" value={form.bookingId} onChange={e => setForm(p => ({ ...p, bookingId: e.target.value }))} placeholder="Например: 42" />
           </div>
 
           {error && (
-            <div style={{ padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, color: '#f87171', fontSize: 13 }}>
+            <div role="alert" style={{ padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, color: '#f87171', fontSize: 13 }}>
               {error}
             </div>
           )}
@@ -249,8 +250,8 @@ function SpecialistPage() {
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 24px' }}>
-      {/* Декоративный glow */}
       <div
+        aria-hidden="true"
         style={{
           position: 'fixed',
           top: '20%',
@@ -321,7 +322,7 @@ function SpecialistPage() {
                     gap: 4,
                   }}
                 >
-                  <span style={{ color: '#a5b4fc' }}>◈</span>
+                  <span aria-hidden="true" style={{ color: '#a5b4fc' }}>◈</span>
                   {specialist.experience}{' '}
                   {specialist.experience === 1
                     ? 'год опыта'
