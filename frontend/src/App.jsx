@@ -12,36 +12,38 @@ function App() {
   return (
     <BrowserRouter>
       <Navbar />
-      <Routes>
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/" element={<CatalogPage />} />
-        <Route path="/specialists/:id" element={<SpecialistPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute role="SPECIALIST">
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/book/:specialistId"
-          element={
-            <ProtectedRoute role="CLIENT">
-              <BookingPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/orders"
-          element={
-            <ProtectedRoute>
-              <OrderBoardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <main>
+        <Routes>
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/" element={<CatalogPage />} />
+          <Route path="/specialists/:id" element={<SpecialistPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute role="SPECIALIST">
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/book/:specialistId"
+            element={
+              <ProtectedRoute role="CLIENT">
+                <BookingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <OrderBoardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
     </BrowserRouter>
   )
 }
