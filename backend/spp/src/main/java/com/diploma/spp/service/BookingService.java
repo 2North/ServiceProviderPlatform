@@ -1,6 +1,8 @@
 package com.diploma.spp.service;
 
 import com.diploma.spp.dto.BookingDto;
+import com.diploma.spp.event.BookingCancelledEvent;
+import com.diploma.spp.event.BookingConfirmedEvent;
 import com.diploma.spp.exception.ConflictException;
 import com.diploma.spp.exception.ResourceNotFoundException;
 import com.diploma.spp.model.Booking;
@@ -14,6 +16,7 @@ import com.diploma.spp.repository.ServiceRepository;
 import com.diploma.spp.repository.TimeSlotRepository;
 import com.diploma.spp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,7 @@ public class BookingService {
     private final UserRepository userRepository;
     private final ServiceRepository serviceRepository;
     private final TimeSlotRepository timeSlotRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public BookingDto create(BookingDto dto) {
@@ -82,8 +86,15 @@ public class BookingService {
 
         booking.setStatus(status);
         booking.setUpdatedAt(LocalDateTime.now());
+        Booking saved = bookingRepository.save(booking);
 
-        return toDto(bookingRepository.save(booking));
+        if (status == BookingStatus.CONFIRMED) {
+            eventPublisher.publishEvent(new BookingConfirmedEvent(this, saved));
+        } else if (status == BookingStatus.CANCELLED) {
+            eventPublisher.publishEvent(new BookingCancelledEvent(this, saved));
+        }
+
+        return toDto(saved);
     }
 
     private BookingDto toDto(Booking booking) {

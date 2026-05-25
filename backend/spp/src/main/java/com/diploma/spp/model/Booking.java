@@ -42,6 +42,12 @@ public class Booking {
 
     String note;
 
+    @Column(name = "google_event_id_client", length = 1024)
+    String googleEventIdClient;
+
+    @Column(name = "google_event_id_specialist", length = 1024)
+    String googleEventIdSpecialist;
+
     LocalDateTime createdAt;
 
     LocalDateTime updatedAt;
