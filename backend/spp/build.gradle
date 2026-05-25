@@ -33,6 +33,9 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
 	// Stripe
 	implementation 'com.stripe:stripe-java:28.3.0'
+	// Caffeine cache
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'com.github.ben-manes.caffeine:caffeine'
 	// Google Calendar API
 	implementation 'com.google.api-client:google-api-client:2.7.0'
 	implementation 'com.google.apis:google-api-services-calendar:v3-rev20240111-2.0.0'
