@@ -3,6 +3,7 @@ import AuthPage from './pages/AuthPage.jsx'
 import CatalogPage from './pages/CatalogPage.jsx'
 import SpecialistPage from './pages/SpecialistPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
+import AnalyticsPage from './pages/AnalyticsPage.jsx'
 import BookingPage from './pages/BookingPage.jsx'
 import OrderBoardPage from './pages/OrderBoardPage.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
@@ -22,6 +23,14 @@ function App() {
             element={
               <ProtectedRoute role="SPECIALIST">
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/analytics"
+            element={
+              <ProtectedRoute role="SPECIALIST">
+                <AnalyticsPage />
               </ProtectedRoute>
             }
           />

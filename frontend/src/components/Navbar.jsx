@@ -86,26 +86,48 @@ function Navbar() {
           ) : (
             <>
               {user?.role === 'SPECIALIST' && (
-                <Link
-                  to="/dashboard"
-                  style={{
-                    color: '#a5b4fc',
-                    textDecoration: 'none',
-                    fontSize: 14,
-                    fontWeight: 500,
-                    padding: '6px 12px',
-                    borderRadius: 6,
-                    transition: 'background 0.2s',
-                  }}
-                  onMouseOver={(e) =>
-                    (e.currentTarget.style.background = 'rgba(99,102,241,0.12)')
-                  }
-                  onMouseOut={(e) =>
-                    (e.currentTarget.style.background = 'transparent')
-                  }
-                >
-                  Дашборд
-                </Link>
+                <>
+                  <Link
+                    to="/dashboard"
+                    style={{
+                      color: '#a5b4fc',
+                      textDecoration: 'none',
+                      fontSize: 14,
+                      fontWeight: 500,
+                      padding: '6px 12px',
+                      borderRadius: 6,
+                      transition: 'background 0.2s',
+                    }}
+                    onMouseOver={(e) =>
+                      (e.currentTarget.style.background = 'rgba(99,102,241,0.12)')
+                    }
+                    onMouseOut={(e) =>
+                      (e.currentTarget.style.background = 'transparent')
+                    }
+                  >
+                    Дашборд
+                  </Link>
+                  <Link
+                    to="/dashboard/analytics"
+                    style={{
+                      color: '#a5b4fc',
+                      textDecoration: 'none',
+                      fontSize: 14,
+                      fontWeight: 500,
+                      padding: '6px 12px',
+                      borderRadius: 6,
+                      transition: 'background 0.2s',
+                    }}
+                    onMouseOver={(e) =>
+                      (e.currentTarget.style.background = 'rgba(99,102,241,0.12)')
+                    }
+                    onMouseOut={(e) =>
+                      (e.currentTarget.style.background = 'transparent')
+                    }
+                  >
+                    Аналитика
+                  </Link>
+                </>
               )}
 
               <Link
