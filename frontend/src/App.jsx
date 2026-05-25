@@ -6,6 +6,8 @@ import DashboardPage from './pages/DashboardPage.jsx'
 import AnalyticsPage from './pages/AnalyticsPage.jsx'
 import BookingPage from './pages/BookingPage.jsx'
 import OrderBoardPage from './pages/OrderBoardPage.jsx'
+import SettingsPage from './pages/SettingsPage.jsx'
+import MyBookingsPage from './pages/MyBookingsPage.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Navbar from './components/Navbar.jsx'
 
@@ -47,6 +49,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <OrderBoardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute role="SPECIALIST">
+                <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-bookings"
+            element={
+              <ProtectedRoute role="CLIENT">
+                <MyBookingsPage />
               </ProtectedRoute>
             }
           />

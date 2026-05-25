@@ -1,6 +1,27 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/useAuthStore.js'
 
+function NavLink({ to, children }) {
+  return (
+    <Link
+      to={to}
+      style={{
+        color: '#a5b4fc',
+        textDecoration: 'none',
+        fontSize: 14,
+        fontWeight: 500,
+        padding: '6px 12px',
+        borderRadius: 6,
+        transition: 'background 0.2s',
+      }}
+      onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(99,102,241,0.12)')}
+      onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
+    >
+      {children}
+    </Link>
+  )
+}
+
 function Navbar() {
   const { token, user, clearAuth } = useAuthStore()
   const navigate = useNavigate()
@@ -87,69 +108,17 @@ function Navbar() {
             <>
               {user?.role === 'SPECIALIST' && (
                 <>
-                  <Link
-                    to="/dashboard"
-                    style={{
-                      color: '#a5b4fc',
-                      textDecoration: 'none',
-                      fontSize: 14,
-                      fontWeight: 500,
-                      padding: '6px 12px',
-                      borderRadius: 6,
-                      transition: 'background 0.2s',
-                    }}
-                    onMouseOver={(e) =>
-                      (e.currentTarget.style.background = 'rgba(99,102,241,0.12)')
-                    }
-                    onMouseOut={(e) =>
-                      (e.currentTarget.style.background = 'transparent')
-                    }
-                  >
-                    Дашборд
-                  </Link>
-                  <Link
-                    to="/dashboard/analytics"
-                    style={{
-                      color: '#a5b4fc',
-                      textDecoration: 'none',
-                      fontSize: 14,
-                      fontWeight: 500,
-                      padding: '6px 12px',
-                      borderRadius: 6,
-                      transition: 'background 0.2s',
-                    }}
-                    onMouseOver={(e) =>
-                      (e.currentTarget.style.background = 'rgba(99,102,241,0.12)')
-                    }
-                    onMouseOut={(e) =>
-                      (e.currentTarget.style.background = 'transparent')
-                    }
-                  >
-                    Аналитика
-                  </Link>
+                  <NavLink to="/dashboard">Дашборд</NavLink>
+                  <NavLink to="/dashboard/analytics">Аналитика</NavLink>
+                  <NavLink to="/settings">Настройки</NavLink>
                 </>
               )}
 
-              <Link
-                to="/orders"
-                style={{
-                  color: '#a5b4fc',
-                  textDecoration: 'none',
-                  fontSize: 14,
-                  fontWeight: 500,
-                  padding: '6px 12px',
-                  borderRadius: 6,
-                  transition: 'background 0.2s',
-                }}
-                onMouseOver={(e) =>
-                  (e.currentTarget.style.background = 'rgba(99,102,241,0.12)')
-                }
-                onMouseOut={(e) =>
-                  (e.currentTarget.style.background = 'transparent')
-                }
-              >
-                Доска заказов
-              </Link>
+              {user?.role === 'CLIENT' && (
+                <NavLink to="/my-bookings">Мои брони</NavLink>
+              )}
+
+              <NavLink to="/orders">Доска заказов</NavLink>
 
               {/* Email пользователя */}
               <span
