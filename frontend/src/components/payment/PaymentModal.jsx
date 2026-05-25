@@ -1,8 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
-
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK ?? '')
 
 const STRIPE_APPEARANCE = {
   theme: 'night',
@@ -107,6 +105,11 @@ function CheckoutForm({ amount, currency, onSuccess, onCancel }) {
 // ── Modal wrapper ──────────────────────────────────────────────────────────
 
 export default function PaymentModal({ clientSecret, amount, currency, onSuccess, onClose }) {
+  const stripePromise = useMemo(
+    () => loadStripe(import.meta.env.VITE_STRIPE_PK ?? ''),
+    []
+  )
+
   return (
     <div
       role="dialog"
