@@ -16,6 +16,7 @@ public class PaymentDto {
     String currency;
     PaymentStatus status;
     String stripePaymentIntentId;
+    String clientSecret;
     LocalDateTime createdAt;
     LocalDateTime paidAt;
 }

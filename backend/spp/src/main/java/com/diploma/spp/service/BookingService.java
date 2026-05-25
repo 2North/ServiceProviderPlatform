@@ -7,11 +7,13 @@ import com.diploma.spp.exception.ConflictException;
 import com.diploma.spp.exception.ResourceNotFoundException;
 import com.diploma.spp.model.Booking;
 import com.diploma.spp.model.BookingStatus;
+import com.diploma.spp.model.Payment;
 import com.diploma.spp.model.ServiceListing;
 import com.diploma.spp.model.SlotStatus;
 import com.diploma.spp.model.TimeSlot;
 import com.diploma.spp.model.User;
 import com.diploma.spp.repository.BookingRepository;
+import com.diploma.spp.repository.PaymentRepository;
 import com.diploma.spp.repository.ServiceRepository;
 import com.diploma.spp.repository.TimeSlotRepository;
 import com.diploma.spp.repository.UserRepository;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,7 @@ public class BookingService {
     private final UserRepository userRepository;
     private final ServiceRepository serviceRepository;
     private final TimeSlotRepository timeSlotRepository;
+    private final PaymentRepository paymentRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -98,14 +102,28 @@ public class BookingService {
     }
 
     private BookingDto toDto(Booking booking) {
+        ServiceListing svc = booking.getService();
+        TimeSlot slot = booking.getTimeSlot();
+        User specialistUser = svc.getSpecialistProfile().getUser();
+
+        Optional<Payment> payment = paymentRepository.findByBooking_Id(booking.getId());
+
         return BookingDto.builder()
                 .id(booking.getId())
                 .clientId(booking.getClient().getId())
-                .serviceId(booking.getService().getId())
-                .timeSlotId(booking.getTimeSlot().getId())
+                .serviceId(svc.getId())
+                .specialistProfileId(svc.getSpecialistProfile().getId())
+                .timeSlotId(slot.getId())
                 .status(booking.getStatus())
                 .note(booking.getNote())
                 .createdAt(booking.getCreatedAt())
+                .serviceName(svc.getTitle())
+                .specialistName(specialistUser.getEmail())
+                .price(svc.getPrice())
+                .slotDate(slot.getSlotDate())
+                .startTime(slot.getStartTime())
+                .paymentId(payment.map(Payment::getId).orElse(null))
+                .paymentStatus(payment.map(Payment::getStatus).orElse(null))
                 .build();
     }
 }

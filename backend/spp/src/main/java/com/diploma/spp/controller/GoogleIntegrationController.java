@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -22,6 +23,17 @@ public class GoogleIntegrationController {
 
     private final GoogleCalendarService googleCalendarService;
     private final UserGoogleIntegrationRepository integrationRepository;
+
+    /**
+     * Returns the Google OAuth authorization URL as JSON so the frontend
+     * can navigate to it while still sending the JWT via axios.
+     */
+    @GetMapping("/auth-url")
+    public ResponseEntity<Map<String, String>> getAuthUrl(@AuthenticationPrincipal User user)
+            throws GeneralSecurityException, IOException {
+        String url = googleCalendarService.buildAuthorizationUrl(user.getId());
+        return ResponseEntity.ok(Map.of("url", url));
+    }
 
     /**
      * Redirect the authenticated user to the Google OAuth consent screen.

@@ -141,6 +141,7 @@ public class StripePaymentService {
                 .currency(payment.getCurrency())
                 .status(payment.getStatus())
                 .stripePaymentIntentId(payment.getStripePaymentIntentId())
+                .clientSecret(payment.getStripeClientSecret())
                 .createdAt(payment.getCreatedAt())
                 .paidAt(payment.getPaidAt())
                 .build();
