@@ -1,6 +1,7 @@
 package com.diploma.spp.exception;
 
 import com.diploma.spp.dto.ErrorResponse;
+import com.stripe.exception.StripeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -57,6 +58,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(403, "Access denied", LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(StripeException.class)
+    public ResponseEntity<ErrorResponse> handleStripe(StripeException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(new ErrorResponse(502, "stripe_error: " + ex.getMessage(), LocalDateTime.now()));
     }
 
     @ExceptionHandler(Exception.class)
