@@ -42,6 +42,10 @@ public class Booking {
 
     String note;
 
+    @OneToOne
+    @JoinColumn(name = "payment_id")
+    Payment payment;
+
     @Column(name = "google_event_id_client", length = 1024)
     String googleEventIdClient;
 
