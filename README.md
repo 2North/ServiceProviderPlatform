@@ -1,93 +1,140 @@
-# service_provider_platform
+# ServicePort Platform
 
+A service marketplace connecting clients with specialists. Clients browse services, book time slots, pay online, and leave reviews. Specialists manage their schedule and receive bookings.
 
+## Tech stack
 
-## Getting started
+- **Backend** — Spring Boot 4.0.3, Java 21, PostgreSQL, Flyway, JWT auth
+- **Frontend** — React 19, Vite, Tailwind CSS, TanStack Query, Zustand
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+---
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Running locally
 
-## Add your files
+### Prerequisites
 
-* [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+- Java 21
+- PostgreSQL 15+
+- Node.js 20.19+
 
+### Backend
+
+```bash
+# Create database
+psql -U postgres -c "CREATE USER spp_user WITH PASSWORD 'spp_pass';"
+psql -U postgres -c "CREATE DATABASE spp_db OWNER spp_user;"
+
+# Set required environment variables (see sections below for integrations)
+export JWT_SECRET=<base64-encoded-secret>
+
+cd backend/spp
+./gradlew bootRun
 ```
-cd existing_repo
-git remote add origin https://disa.codestorage.space/nichita.boldu/service_provider_platform.git
-git branch -M main
-git push -uf origin main
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-## Integrate with your tools
+---
 
-* [Set up project integrations](https://disa.codestorage.space/nichita.boldu/service_provider_platform/-/settings/integrations)
+## Stripe integration (test mode)
 
-## Collaborate with your team
+Payments are processed via Stripe Payment Intents. No card data ever touches the server — only a `PaymentIntent` ID is stored, which removes the project from PCI DSS scope (SAQ A).
 
-* [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+### 1. Get test API keys
 
-## Test and Deploy
+1. Sign up or log in at [dashboard.stripe.com](https://dashboard.stripe.com)
+2. Make sure **Test mode** is toggled on (top-right switch)
+3. Go to **Developers → API keys**
+4. Copy **Secret key** (starts with `sk_test_...`)
 
-Use the built-in continuous integration in GitLab.
+### 2. Set environment variables
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+```bash
+export STRIPE_API_KEY=sk_test_...
+export STRIPE_CURRENCY=eur          # default, can be changed
+```
 
-***
+### 3. Set up the webhook for local development
 
-# Editing this README
+Install the Stripe CLI:
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+```bash
+# Arch Linux
+yay -S stripe-cli
+# or download from https://stripe.com/docs/stripe-cli
+```
 
-## Suggestions for a good README
+Forward events to your local server:
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+```bash
+stripe listen --forward-to localhost:8080/api/webhooks/stripe
+```
 
-## Name
-Choose a self-explaining name for your project.
+The CLI prints a **webhook signing secret** (`whsec_...`). Set it:
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+```bash
+export STRIPE_WEBHOOK_SECRET=whsec_...
+```
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+Restart the backend after setting variables.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### 4. Test cards
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+| Card number          | Behaviour                     |
+|----------------------|-------------------------------|
+| 4242 4242 4242 4242  | Payment succeeds immediately  |
+| 4000 0000 0000 9995  | Declined — insufficient funds |
+| 4000 0025 0000 3155  | Requires 3D Secure            |
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+Use any future expiry date, any 3-digit CVC, any ZIP code.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### Payment flow
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+1. Client creates a booking → status `PENDING`
+2. Client calls `POST /api/bookings/{id}/payment` → receives `clientSecret`
+3. Frontend uses Stripe.js to confirm the payment with the `clientSecret`
+4. Stripe calls `POST /api/webhooks/stripe` with `payment_intent.succeeded`
+5. Backend sets booking status to `CONFIRMED` and payment status to `SUCCEEDED`
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+---
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+## Google Calendar integration
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+Connects a user's Google Calendar so confirmed bookings automatically appear in both participants' calendars.
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+### Setup
 
-## License
-For open source projects, say how it is licensed.
+1. Go to [console.cloud.google.com](https://console.cloud.google.com)
+2. Create a project → **APIs & Services → Enable APIs** → enable **Google Calendar API**
+3. **Credentials → Create → OAuth 2.0 Client ID** (type: Web application)
+4. Add authorized redirect URI: `http://localhost:8080/api/integrations/google/callback`
+5. Copy Client ID and Client Secret
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+```bash
+export GOOGLE_CLIENT_ID=...
+export GOOGLE_CLIENT_SECRET=...
+export GOOGLE_TOKEN_ENCRYPTION_SECRET=<random-32-char-string>
+```
+
+On the **OAuth consent screen**, add test user emails before Google verification.
+
+---
+
+## Environment variables reference
+
+| Variable                        | Required | Default                              | Description                        |
+|---------------------------------|----------|--------------------------------------|------------------------------------|
+| `JWT_SECRET`                    | yes      | dev fallback in yml                  | Base64 HMAC key for JWT signing    |
+| `STRIPE_API_KEY`                | yes      | —                                    | Stripe secret key (`sk_test_...`)  |
+| `STRIPE_WEBHOOK_SECRET`         | yes      | —                                    | Stripe webhook endpoint secret     |
+| `STRIPE_CURRENCY`               | no       | `eur`                                | ISO 4217 currency code             |
+| `GOOGLE_CLIENT_ID`              | no       | —                                    | Google OAuth client ID             |
+| `GOOGLE_CLIENT_SECRET`          | no       | —                                    | Google OAuth client secret         |
+| `GOOGLE_REDIRECT_URI`           | no       | `http://localhost:8080/...`          | OAuth callback URL                 |
+| `GOOGLE_TOKEN_ENCRYPTION_SECRET`| no       | —                                    | AES key for token storage          |
+| `CORS_ALLOWED_ORIGINS`          | no       | `http://localhost:5173`              | Allowed frontend origins           |
