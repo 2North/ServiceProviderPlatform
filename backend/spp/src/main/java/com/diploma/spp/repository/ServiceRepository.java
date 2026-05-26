@@ -10,5 +10,6 @@ import java.util.List;
 public interface ServiceRepository extends JpaRepository<ServiceListing, Long> {
     List<ServiceListing> findBySpecialistProfileId(Long specialistId);
     List<ServiceListing> findByCategoryId(Long categoryId);
+    Page<ServiceListing> findByCategoryId(Long categoryId, Pageable pageable);
     Page<ServiceListing> findByActiveTrue(Pageable pageable);
 }

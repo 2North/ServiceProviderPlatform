@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 @RestController
 @RequestMapping("/api/services")
@@ -37,8 +37,12 @@ public class ServiceController {
     }
 
     @GetMapping("/category/{categoryId}")
-    public List<ServiceDto> getByCategory(@PathVariable Long categoryId) {
-        return serviceService.getByCategory(categoryId);
+    public Page<ServiceDto> getByCategory(
+            @PathVariable Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size
+    ) {
+        return serviceService.getByCategory(categoryId, page, size);
     }
 
     @PostMapping

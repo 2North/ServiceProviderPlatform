@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,10 +44,10 @@ public class ServiceService {
                 .collect(Collectors.toList());
     }
 
-    public List<ServiceDto> getByCategory(Long categoryId) {
-        return serviceRepository.findByCategoryId(categoryId).stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+    public Page<ServiceDto> getByCategory(Long categoryId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return serviceRepository.findByCategoryId(categoryId, pageable)
+                .map(this::toDto);
     }
 
     public ServiceDto create(ServiceDto dto) {

@@ -1,8 +1,8 @@
 import client from './client.js'
 
-// Получить все услуги
-export const getAllServices = () =>
-    client.get('/services').then((r) => r.data.content ?? r.data)
+// Получить все услуги (постранично)
+export const getAllServices = ({ page = 0, size = 9 } = {}) =>
+    client.get('/services', { params: { page, size } }).then((r) => r.data)
 
 // Получить услугу по ID
 export const getServiceById = (id) =>
@@ -12,9 +12,9 @@ export const getServiceById = (id) =>
 export const getServicesBySpecialist = (specialistId) =>
   client.get(`/services/specialist/${specialistId}`).then((r) => r.data)
 
-// Получить услуги по категории
-export const getServicesByCategory = (categoryId) =>
-  client.get(`/services/category/${categoryId}`).then((r) => r.data)
+// Получить услуги по категории (постранично)
+export const getServicesByCategory = (categoryId, { page = 0, size = 9 } = {}) =>
+  client.get(`/services/category/${categoryId}`, { params: { page, size } }).then((r) => r.data)
 
 // Создать услугу (только SPECIALIST)
 export const createService = (data) =>
