@@ -71,6 +71,16 @@ public class OrderService {
         SpecialistProfile specialist = specialistProfileRepository.findById(dto.getSpecialistId())
                 .orElseThrow(() -> new ResourceNotFoundException("Specialist not found"));
 
+        order.setStatus(OrderStatus.CLOSED);
+        order.setUpdatedAt(LocalDateTime.now());
+        orderRepository.save(order);
+
+        if (orderResponseRepository.existsByOrder_IdAndSpecialist_Id(order.getId(), specialist.getId())) {
+            return toResponseDto(orderResponseRepository.findByOrder_Id(order.getId()).stream()
+                    .filter(r -> r.getSpecialist().getId().equals(specialist.getId()))
+                    .findFirst().orElseThrow());
+        }
+
         OrderResponse response = OrderResponse.builder()
                 .order(order)
                 .specialist(specialist)
@@ -80,10 +90,6 @@ public class OrderService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-
-        order.setStatus(OrderStatus.CLOSED);
-        order.setUpdatedAt(LocalDateTime.now());
-        orderRepository.save(order);
 
         return toResponseDto(orderResponseRepository.save(response));
     }
