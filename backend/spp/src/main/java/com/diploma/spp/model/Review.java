@@ -21,7 +21,7 @@ public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
+//.
     @OneToOne
     @JoinColumn(name = "booking_id", nullable = false)
     Booking booking;
