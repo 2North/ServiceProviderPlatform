@@ -1,199 +1,262 @@
 -- ══════════════════════════════════════════════════════
--- SEED DATA  |  пароль для всех: Test1234!
+-- SEED DATA  (полный снимок БД на 2026-05-26)
+-- Пароли: Test1234! для seed-аккаунтов
 -- ══════════════════════════════════════════════════════
 
 -- ── Категории ─────────────────────────────────────────
-INSERT INTO categories (name) VALUES
-  ('Ремонт и строительство'),
-  ('Красота и уход'),
-  ('Репетиторство'),
-  ('IT и технологии'),
-  ('Фото и видео')
+INSERT INTO categories (id, name, description, created_at) VALUES
+  (1, 'Ремонт техники',          'Ремонт бытовой и компьютерной техники', '2026-03-20 04:16:10.530871'),
+  (2, 'Ремонт и строительство',  NULL, '2026-05-26 15:56:44.428987'),
+  (3, 'Красота и уход',          NULL, '2026-05-26 15:56:44.428987'),
+  (4, 'Репетиторство',           NULL, '2026-05-26 15:56:44.428987'),
+  (5, 'IT и технологии',         NULL, '2026-05-26 15:56:44.428987'),
+  (6, 'Фото и видео',            NULL, '2026-05-26 15:56:44.428987')
 ON CONFLICT DO NOTHING;
 
--- ── Специалисты ───────────────────────────────────────
-INSERT INTO users (email, password, role, first_name, last_name, phone, created_at, updated_at) VALUES
-  ('specialist1@mail.com', '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'SPECIALIST'::user_role, 'Андрей',  'Попеску',  '+37369111001', now(), now()),
-  ('specialist2@mail.com', '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'SPECIALIST'::user_role, 'Мария',   'Иванова',  '+37369111002', now(), now()),
-  ('specialist3@mail.com', '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'SPECIALIST'::user_role, 'Виктор',  'Лупу',     '+37369111003', now(), now()),
-  ('specialist4@mail.com', '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'SPECIALIST'::user_role, 'Елена',   'Чобану',   '+37369111004', now(), now()),
-  ('specialist5@mail.com', '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'SPECIALIST'::user_role, 'Дмитрий', 'Руссу',    '+37369111005', now(), now())
+-- ── Пользователи ──────────────────────────────────────
+INSERT INTO users (id, email, password, first_name, last_name, phone, role, enabled, created_at, updated_at) VALUES
+  (1,  'nikita@mail.com',          '$2a$10$YhsbQ6VFOhgRmMOO6AVUFuSnOB8fnicnSgM8IT6aWCskN0zSEXw9q', 'Nikita',    'Boldu',     '+37369000000', 'ADMIN'::user_role,       true, '2026-03-19 23:17:29.835870', '2026-03-19 23:17:29.835888'),
+  (2,  'specialist@mail.com',      '$2a$10$CD0dDAL78GmMvoau.cRbeOngXgfCvo5PBLvwu.oyf0WmS8Si2g6/m', 'Specialist','Specialist', '+37369000000', 'SPECIALIST'::user_role,  true, '2026-03-20 04:26:20.376766', '2026-03-20 04:26:20.376781'),
+  (3,  'oleg.mongol@mail.com',     '$2a$10$uP4B0WZG/.rL2CSRJWyGWuZchfbkhHuGhwEJ3lFm/mraiB/ybPCAy', 'Олег',      'Монгол',    NULL,           'CLIENT'::user_role,      true, '2026-04-24 00:45:01.497866', '2026-04-24 00:45:01.497887'),
+  (4,  'anton.ismailov@mail.com',  '$2a$10$iIygFHZxPD3lae9st5oDR.kigcDRioS.iOlWX6kz4axc7v2EiZlx6', 'Anton',     'Ismailov',  NULL,           'CLIENT'::user_role,      true, '2026-04-24 01:58:40.717670', '2026-04-24 01:58:40.717691'),
+  (5,  'timur.orehov@mail.com',    '$2a$10$G.y2bqd6AovCpUqpG3Yd5O.TEa9lGJzu0H9PXz9WX7g58ctMLF/4C', 'Timur',     'Orehov',    NULL,           'CLIENT'::user_role,      true, '2026-04-24 01:59:35.307046', '2026-04-24 01:59:35.307068'),
+  (6,  'artem.tokarev@mail.com',   '$2a$10$BsBuaQ9Yr/Iwtu95nQygju15mxDLKuq8ZbHnQONuETyY1dHlhRZ0y', 'Artem',     'Tokarev',   NULL,           'CLIENT'::user_role,      true, '2026-04-24 02:00:49.144295', '2026-04-24 02:00:49.144325'),
+  (7,  'specialist1@mail.com',     '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Андрей',    'Попеску',   '+37369111001', 'SPECIALIST'::user_role,  true, '2026-05-26 16:00:22.397575', '2026-05-26 16:00:22.397575'),
+  (8,  'specialist2@mail.com',     '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Мария',     'Иванова',   '+37369111002', 'SPECIALIST'::user_role,  true, '2026-05-26 16:00:22.397575', '2026-05-26 16:00:22.397575'),
+  (9,  'specialist3@mail.com',     '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Виктор',    'Лупу',      '+37369111003', 'SPECIALIST'::user_role,  true, '2026-05-26 16:00:22.397575', '2026-05-26 16:00:22.397575'),
+  (10, 'specialist4@mail.com',     '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Елена',     'Чобану',    '+37369111004', 'SPECIALIST'::user_role,  true, '2026-05-26 16:00:22.397575', '2026-05-26 16:00:22.397575'),
+  (11, 'specialist5@mail.com',     '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Дмитрий',   'Руссу',     '+37369111005', 'SPECIALIST'::user_role,  true, '2026-05-26 16:00:22.397575', '2026-05-26 16:00:22.397575'),
+  (12, 'client1@mail.com',         '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Алексей',   'Морару',    '+37369222001', 'CLIENT'::user_role,      true, '2026-05-26 16:00:22.399917', '2026-05-26 16:00:22.399917'),
+  (13, 'client2@mail.com',         '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Наталья',   'Боднар',    '+37369222002', 'CLIENT'::user_role,      true, '2026-05-26 16:00:22.399917', '2026-05-26 16:00:22.399917'),
+  (14, 'client3@mail.com',         '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Сергей',    'Тимуш',     '+37369222003', 'CLIENT'::user_role,      true, '2026-05-26 16:00:22.399917', '2026-05-26 16:00:22.399917'),
+  (15, 'client4@mail.com',         '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Ирина',     'Негру',     '+37369222004', 'CLIENT'::user_role,      true, '2026-05-26 16:00:22.399917', '2026-05-26 16:00:22.399917'),
+  (16, 'client5@mail.com',         '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Павел',     'Стан',      '+37369222005', 'CLIENT'::user_role,      true, '2026-05-26 16:00:22.399917', '2026-05-26 16:00:22.399917'),
+  (17, 'client6@mail.com',         '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Оксана',    'Гуцу',      '+37369222006', 'CLIENT'::user_role,      true, '2026-05-26 16:00:22.399917', '2026-05-26 16:00:22.399917'),
+  (18, 'client7@mail.com',         '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Роман',     'Дану',      '+37369222007', 'CLIENT'::user_role,      true, '2026-05-26 16:00:22.399917', '2026-05-26 16:00:22.399917'),
+  (19, 'client8@mail.com',         '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Людмила',   'Паску',     '+37369222008', 'CLIENT'::user_role,      true, '2026-05-26 16:00:22.399917', '2026-05-26 16:00:22.399917'),
+  (20, 'client9@mail.com',         '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Тудор',     'Влад',      '+37369222009', 'CLIENT'::user_role,      true, '2026-05-26 16:00:22.399917', '2026-05-26 16:00:22.399917'),
+  (21, 'client10@mail.com',        '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'Кристина',  'Енаке',     '+37369222010', 'CLIENT'::user_role,      true, '2026-05-26 16:00:22.399917', '2026-05-26 16:00:22.399917')
 ON CONFLICT (email) DO NOTHING;
 
--- ── Клиенты ───────────────────────────────────────────
-INSERT INTO users (email, password, role, first_name, last_name, phone, created_at, updated_at) VALUES
-  ('client1@mail.com',  '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'CLIENT'::user_role, 'Алексей',  'Морару',  '+37369222001', now(), now()),
-  ('client2@mail.com',  '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'CLIENT'::user_role, 'Наталья',  'Боднар',  '+37369222002', now(), now()),
-  ('client3@mail.com',  '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'CLIENT'::user_role, 'Сергей',   'Тимуш',   '+37369222003', now(), now()),
-  ('client4@mail.com',  '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'CLIENT'::user_role, 'Ирина',    'Негру',   '+37369222004', now(), now()),
-  ('client5@mail.com',  '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'CLIENT'::user_role, 'Павел',    'Стан',    '+37369222005', now(), now()),
-  ('client6@mail.com',  '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'CLIENT'::user_role, 'Оксана',   'Гуцу',    '+37369222006', now(), now()),
-  ('client7@mail.com',  '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'CLIENT'::user_role, 'Роман',    'Дану',    '+37369222007', now(), now()),
-  ('client8@mail.com',  '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'CLIENT'::user_role, 'Людмила',  'Паску',   '+37369222008', now(), now()),
-  ('client9@mail.com',  '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'CLIENT'::user_role, 'Тудор',    'Влад',    '+37369222009', now(), now()),
-  ('client10@mail.com', '$2a$10$Xn15oOe8FCVwbriKVYl0IOjd10cbQDl.Gw5yzNWFi7uIEruiv8yeO', 'CLIENT'::user_role, 'Кристина', 'Енаке',   '+37369222010', now(), now())
-ON CONFLICT (email) DO NOTHING;
+SELECT pg_catalog.setval('users_id_seq', 36, true);
 
 -- ── Профили специалистов ──────────────────────────────
-INSERT INTO specialist_profiles (user_id, bio, experience, rating, verified, created_at, updated_at)
-SELECT u.id, v.bio, v.exp, v.rating, true, now(), now()
-FROM (VALUES
-  ('specialist1@mail.com', 'Мастер-строитель, ремонт квартир под ключ.',    8,  4.8),
-  ('specialist2@mail.com', 'Парикмахер и стилист, окрашивание и укладки.',  5,  4.7),
-  ('specialist3@mail.com', 'Репетитор по математике и физике.',             10,  4.9),
-  ('specialist4@mail.com', 'Full-stack разработчик, React и Spring Boot.',   6,  4.6),
-  ('specialist5@mail.com', 'Фотограф, портреты и события.',                  4,  4.5)
-) AS v(email, bio, exp, rating)
-JOIN users u ON u.email = v.email
+INSERT INTO specialist_profiles (id, user_id, bio, experience, rating, verified, created_at, updated_at) VALUES
+  (1, 2,  'Опытный мастер по ремонту техники, 10 лет опыта',      10, 5.00, false, '2026-03-20 04:33:42.815518', '2026-05-26 17:43:12.202701'),
+  (2, 7,  'Мастер-строитель, ремонт квартир под ключ.',             8, 4.80, true,  '2026-05-26 16:00:22.401119', '2026-05-26 16:00:22.401119'),
+  (3, 8,  'Парикмахер и стилист, окрашивание и укладки.',           5, 4.70, true,  '2026-05-26 16:00:22.401119', '2026-05-26 16:00:22.401119'),
+  (4, 9,  'Репетитор по математике и физике.',                     10, 4.90, true,  '2026-05-26 16:00:22.401119', '2026-05-26 16:00:22.401119'),
+  (5, 10, 'Full-stack разработчик, React и Spring Boot.',           6, 4.60, true,  '2026-05-26 16:00:22.401119', '2026-05-26 16:00:22.401119'),
+  (6, 11, 'Фотограф, портреты и события.',                          4, 4.50, true,  '2026-05-26 16:00:22.401119', '2026-05-26 16:00:22.401119')
 ON CONFLICT DO NOTHING;
 
--- ── Услуги (3 на специалиста = 15) ────────────────────
-INSERT INTO services (specialist_id, category_id, title, description, price, duration, active, created_at, updated_at)
-SELECT sp.id, c.id, v.title, v.descr, v.price::numeric, v.dur, true, now(), now()
-FROM (VALUES
-  ('specialist1@mail.com', 'Ремонт и строительство', 'Штукатурка стен',       'Выравнивание и штукатурка.',         '350.00', 240),
-  ('specialist1@mail.com', 'Ремонт и строительство', 'Укладка плитки',        'Ванная, кухня, любые форматы.',      '500.00', 300),
-  ('specialist1@mail.com', 'Ремонт и строительство', 'Монтаж гипсокартона',   'Перегородки и потолки.',             '400.00', 270),
-  ('specialist2@mail.com', 'Красота и уход',          'Стрижка и укладка',     'Женская и мужская стрижка.',         '150.00',  60),
-  ('specialist2@mail.com', 'Красота и уход',          'Окрашивание волос',     'Однотонное и мелирование.',          '350.00', 120),
-  ('specialist2@mail.com', 'Красота и уход',          'Уход за бровями',       'Коррекция и окрашивание.',            '80.00',  30),
-  ('specialist3@mail.com', 'Репетиторство',           'Математика 9-12 класс', 'Подготовка к экзаменам.',            '200.00',  90),
-  ('specialist3@mail.com', 'Репетиторство',           'Физика 10-12 класс',    'Механика, электродинамика.',         '200.00',  90),
-  ('specialist3@mail.com', 'Репетиторство',           'Подготовка к BAC',      'Интенсив по всем темам.',            '300.00', 120),
-  ('specialist4@mail.com', 'IT и технологии',         'Разработка лендинга',   'Адаптивный сайт на React.',         '1200.00', 480),
-  ('specialist4@mail.com', 'IT и технологии',         'REST API на Spring',    'Проектирование и реализация.',      '1500.00', 600),
-  ('specialist4@mail.com', 'IT и технологии',         'Консультация по коду',  'Код-ревью, архитектурные советы.',   '250.00',  60),
-  ('specialist5@mail.com', 'Фото и видео',            'Портретная съёмка',     '1 час, 20 обработанных фото.',       '400.00',  60),
-  ('specialist5@mail.com', 'Фото и видео',            'Съёмка мероприятий',    'До 4 часов, репортаж.',              '800.00', 240),
-  ('specialist5@mail.com', 'Фото и видео',            'Предметная съёмка',     'Товары для маркетплейсов.',          '300.00',  90)
-) AS v(email, cat, title, descr, price, dur)
-JOIN users u ON u.email = v.email
-JOIN specialist_profiles sp ON sp.user_id = u.id
-JOIN categories c ON c.name = v.cat
+SELECT pg_catalog.setval('specialist_profiles_id_seq', 11, true);
+
+-- ── Услуги ────────────────────────────────────────────
+INSERT INTO services (id, specialist_id, category_id, title, description, price, duration, active, created_at, updated_at) VALUES
+  (1,  1, 1, 'Ремонт ноутбука',                                  'Диагностика и ремонт ноутбуков любых марок',            150.00, 120, true, '2026-03-20 04:34:51.434339', '2026-05-15 12:24:38.088542'),
+  (3,  1, 1, 'Починка стиральных машин',                         'Починка машин, ремонт электродвигателей, насосов, сливов', 400.00, 120, true, '2026-04-24 02:05:36.156323', '2026-05-15 12:23:16.883817'),
+  (4,  1, 1, 'Чистка посудомоечных машин, смазка компонентов',   'lorem ipsum',                                           400.00, 180, true, '2026-05-15 12:23:10.468670', '2026-05-15 12:23:10.468685'),
+  (5,  2, 2, 'Штукатурка стен',                                  'Выравнивание и штукатурка.',                            350.00, 240, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (6,  2, 2, 'Укладка плитки',                                   'Ванная, кухня, любые форматы.',                         500.00, 300, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (7,  2, 2, 'Монтаж гипсокартона',                              'Перегородки и потолки.',                                400.00, 270, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (8,  3, 3, 'Стрижка и укладка',                                'Женская и мужская стрижка.',                            150.00,  60, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (9,  3, 3, 'Окрашивание волос',                                'Однотонное и мелирование.',                             350.00, 120, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (10, 3, 3, 'Уход за бровями',                                  'Коррекция и окрашивание.',                               80.00,  30, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (11, 4, 4, 'Математика 9-12 класс',                            'Подготовка к экзаменам.',                               200.00,  90, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (12, 4, 4, 'Физика 10-12 класс',                               'Механика, электродинамика.',                            200.00,  90, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (13, 4, 4, 'Подготовка к BAC',                                 'Интенсив по всем темам.',                               300.00, 120, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (14, 5, 5, 'Разработка лендинга',                              'Адаптивный сайт на React.',                            1200.00, 480, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (15, 5, 5, 'REST API на Spring',                               'Проектирование и реализация.',                         1500.00, 600, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (16, 5, 5, 'Консультация по коду',                             'Код-ревью, архитектурные советы.',                      250.00,  60, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (17, 6, 6, 'Портретная съёмка',                                '1 час, 20 обработанных фото.',                          400.00,  60, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (18, 6, 6, 'Съёмка мероприятий',                               'До 4 часов, репортаж.',                                 800.00, 240, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602'),
+  (19, 6, 6, 'Предметная съёмка',                                'Товары для маркетплейсов.',                              300.00,  90, true, '2026-05-26 16:00:22.403602', '2026-05-26 16:00:22.403602')
 ON CONFLICT DO NOTHING;
 
--- ── Слоты (3 будущих AVAILABLE + 3 прошлых BOOKED на специалиста) ──
-INSERT INTO time_slots (specialist_id, slot_date, start_time, end_time, status, created_at, updated_at)
-SELECT sp.id, v.sd::date, v.st::time, v.et::time, v.sts::slot_status, now(), now()
-FROM (VALUES
-  ('specialist1@mail.com', '2026-06-02', '09:00', '13:00', 'AVAILABLE'),
-  ('specialist1@mail.com', '2026-06-03', '10:00', '14:00', 'AVAILABLE'),
-  ('specialist1@mail.com', '2026-06-04', '09:00', '13:00', 'AVAILABLE'),
-  ('specialist1@mail.com', '2026-05-20', '09:00', '13:00', 'BOOKED'),
-  ('specialist1@mail.com', '2026-05-21', '09:00', '13:00', 'BOOKED'),
-  ('specialist1@mail.com', '2026-05-22', '09:00', '13:00', 'BOOKED'),
+SELECT pg_catalog.setval('services_id_seq', 34, true);
 
-  ('specialist2@mail.com', '2026-06-02', '10:00', '11:00', 'AVAILABLE'),
-  ('specialist2@mail.com', '2026-06-02', '11:00', '12:00', 'AVAILABLE'),
-  ('specialist2@mail.com', '2026-06-03', '10:00', '11:00', 'AVAILABLE'),
-  ('specialist2@mail.com', '2026-05-19', '10:00', '11:00', 'BOOKED'),
-  ('specialist2@mail.com', '2026-05-20', '11:00', '12:00', 'BOOKED'),
-  ('specialist2@mail.com', '2026-05-21', '10:00', '11:00', 'BOOKED'),
-
-  ('specialist3@mail.com', '2026-06-02', '14:00', '15:30', 'AVAILABLE'),
-  ('specialist3@mail.com', '2026-06-03', '14:00', '15:30', 'AVAILABLE'),
-  ('specialist3@mail.com', '2026-06-04', '14:00', '15:30', 'AVAILABLE'),
-  ('specialist3@mail.com', '2026-05-19', '14:00', '15:30', 'BOOKED'),
-  ('specialist3@mail.com', '2026-05-20', '14:00', '15:30', 'BOOKED'),
-  ('specialist3@mail.com', '2026-05-21', '14:00', '15:30', 'BOOKED'),
-
-  ('specialist4@mail.com', '2026-06-02', '09:00', '10:00', 'AVAILABLE'),
-  ('specialist4@mail.com', '2026-06-03', '09:00', '10:00', 'AVAILABLE'),
-  ('specialist4@mail.com', '2026-06-05', '09:00', '10:00', 'AVAILABLE'),
-  ('specialist4@mail.com', '2026-05-18', '09:00', '10:00', 'BOOKED'),
-  ('specialist4@mail.com', '2026-05-19', '09:00', '10:00', 'BOOKED'),
-  ('specialist4@mail.com', '2026-05-20', '09:00', '10:00', 'BOOKED'),
-
-  ('specialist5@mail.com', '2026-06-06', '11:00', '12:00', 'AVAILABLE'),
-  ('specialist5@mail.com', '2026-06-07', '11:00', '12:00', 'AVAILABLE'),
-  ('specialist5@mail.com', '2026-06-08', '11:00', '12:00', 'AVAILABLE'),
-  ('specialist5@mail.com', '2026-05-17', '11:00', '12:00', 'BOOKED'),
-  ('specialist5@mail.com', '2026-05-18', '11:00', '12:00', 'BOOKED'),
-  ('specialist5@mail.com', '2026-05-19', '11:00', '12:00', 'BOOKED')
-) AS v(email, sd, st, et, sts)
-JOIN users u ON u.email = v.email
-JOIN specialist_profiles sp ON sp.user_id = u.id
+-- ── Слоты ─────────────────────────────────────────────
+INSERT INTO time_slots (id, specialist_id, slot_date, start_time, end_time, status, created_at, updated_at) VALUES
+  (1,   1, '2026-05-13', '10:00', '11:00', 'BOOKED'::slot_status,     '2026-05-12 12:57:35.549472', '2026-05-12 13:01:11.674094'),
+  (2,   1, '2026-05-20', '10:00', '11:00', 'BOOKED'::slot_status,     '2026-05-13 13:04:49.278088', '2026-05-13 13:06:02.389984'),
+  (4,   1, '2026-07-24', '10:00', '12:00', 'BOOKED'::slot_status,     '2026-05-13 13:16:52.099290', '2026-05-15 12:21:13.476199'),
+  (5,   1, '2026-05-17', '10:00', '16:00', 'CANCELLED'::slot_status,  '2026-05-15 12:23:45.249834', '2026-05-25 23:00:00.010626'),
+  (7,   1, '2026-05-28', '10:00', '11:00', 'BOOKED'::slot_status,     '2026-05-26 14:56:08.488261', '2026-05-26 17:57:38.219183'),
+  (8,   1, '2026-07-01', '10:00', '11:00', 'BOOKED'::slot_status,     '2026-05-26 18:04:37.948989', '2026-05-26 18:07:42.594389'),
+  (9,   1, '2026-05-27', '09:00', '14:00', 'BOOKED'::slot_status,     '2026-05-26 18:11:24.134929', '2026-05-26 18:11:43.484341'),
+  (13,  1, '2026-06-04', '10:00', '14:00', 'BOOKED'::slot_status,     '2026-05-26 18:14:41.315730', '2026-05-26 18:15:02.776821'),
+  (14,  1, '2026-05-29', '10:00', '15:00', 'BOOKED'::slot_status,     '2026-05-26 18:36:33.917224', '2026-05-26 18:37:02.693926'),
+  -- specialist@mail.com — история с 20 февраля
+  (90,  1, '2026-02-20', '10:00', '12:00', 'BOOKED'::slot_status, '2026-02-20', '2026-02-20'),
+  (91,  1, '2026-02-25', '10:00', '12:00', 'BOOKED'::slot_status, '2026-02-25', '2026-02-25'),
+  (92,  1, '2026-03-02', '10:00', '12:00', 'BOOKED'::slot_status, '2026-03-02', '2026-03-02'),
+  (93,  1, '2026-03-07', '10:00', '12:00', 'BOOKED'::slot_status, '2026-03-07', '2026-03-07'),
+  (94,  1, '2026-03-12', '10:00', '12:00', 'BOOKED'::slot_status, '2026-03-12', '2026-03-12'),
+  (95,  1, '2026-03-17', '10:00', '12:00', 'BOOKED'::slot_status, '2026-03-17', '2026-03-17'),
+  (96,  1, '2026-03-22', '10:00', '12:00', 'BOOKED'::slot_status, '2026-03-22', '2026-03-22'),
+  (97,  1, '2026-03-27', '10:00', '12:00', 'BOOKED'::slot_status, '2026-03-27', '2026-03-27'),
+  (98,  1, '2026-04-01', '10:00', '12:00', 'BOOKED'::slot_status, '2026-04-01', '2026-04-01'),
+  (99,  1, '2026-04-06', '10:00', '12:00', 'BOOKED'::slot_status, '2026-04-06', '2026-04-06'),
+  (100, 1, '2026-04-11', '10:00', '12:00', 'BOOKED'::slot_status, '2026-04-11', '2026-04-11'),
+  (101, 1, '2026-04-16', '10:00', '12:00', 'BOOKED'::slot_status, '2026-04-16', '2026-04-16'),
+  (102, 1, '2026-04-21', '10:00', '12:00', 'BOOKED'::slot_status, '2026-04-21', '2026-04-21'),
+  (103, 1, '2026-04-26', '10:00', '12:00', 'BOOKED'::slot_status, '2026-04-26', '2026-04-26'),
+  (104, 1, '2026-05-01', '10:00', '12:00', 'BOOKED'::slot_status, '2026-05-01', '2026-05-01'),
+  (105, 1, '2026-05-06', '10:00', '12:00', 'BOOKED'::slot_status, '2026-05-06', '2026-05-06'),
+  (106, 1, '2026-05-11', '10:00', '12:00', 'BOOKED'::slot_status, '2026-05-11', '2026-05-11'),
+  (107, 1, '2026-05-16', '10:00', '12:00', 'BOOKED'::slot_status, '2026-05-16', '2026-05-16'),
+  (108, 1, '2026-05-21', '10:00', '12:00', 'BOOKED'::slot_status, '2026-05-21', '2026-05-21'),
+  (109, 1, '2026-05-26', '10:00', '12:00', 'BOOKED'::slot_status, '2026-05-26', '2026-05-26'),
+  -- specialist1–5 слоты
+  (15, 2, '2026-05-22', '09:00', '13:00', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (16, 2, '2026-05-21', '09:00', '13:00', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (17, 2, '2026-05-20', '09:00', '13:00', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (18, 2, '2026-06-04', '09:00', '13:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (19, 2, '2026-06-03', '10:00', '14:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (20, 2, '2026-06-02', '09:00', '13:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (21, 3, '2026-05-21', '10:00', '11:00', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (22, 3, '2026-05-20', '11:00', '12:00', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (23, 3, '2026-05-19', '10:00', '11:00', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (24, 3, '2026-06-03', '10:00', '11:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (25, 3, '2026-06-02', '11:00', '12:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (26, 3, '2026-06-02', '10:00', '11:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (27, 4, '2026-05-21', '14:00', '15:30', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (28, 4, '2026-05-20', '14:00', '15:30', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (29, 4, '2026-05-19', '14:00', '15:30', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (30, 4, '2026-06-04', '14:00', '15:30', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (31, 4, '2026-06-03', '14:00', '15:30', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (32, 4, '2026-06-02', '14:00', '15:30', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (33, 5, '2026-05-20', '09:00', '10:00', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (34, 5, '2026-05-19', '09:00', '10:00', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (35, 5, '2026-05-18', '09:00', '10:00', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (36, 5, '2026-06-05', '09:00', '10:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (37, 5, '2026-06-03', '09:00', '10:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (38, 5, '2026-06-02', '09:00', '10:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (39, 6, '2026-05-19', '11:00', '12:00', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (40, 6, '2026-05-18', '11:00', '12:00', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (41, 6, '2026-05-17', '11:00', '12:00', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (42, 6, '2026-06-08', '11:00', '12:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (43, 6, '2026-06-07', '11:00', '12:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (44, 6, '2026-06-06', '11:00', '12:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495')
 ON CONFLICT DO NOTHING;
 
--- ── Бронирования (15 штук, на прошлых BOOKED слотах) ──
-INSERT INTO bookings (client_id, service_id, time_slot_id, status, note, created_at, updated_at)
-SELECT
-  cu.id,
-  (SELECT s.id FROM services s
-   JOIN specialist_profiles sp2 ON sp2.id = s.specialist_id
-   WHERE sp2.user_id = su.id AND s.title = v.svc LIMIT 1),
-  (SELECT ts.id FROM time_slots ts
-   JOIN specialist_profiles sp2 ON sp2.id = ts.specialist_id
-   WHERE sp2.user_id = su.id AND ts.slot_date = v.sd::date AND ts.status = 'BOOKED'::slot_status
-   LIMIT 1),
-  v.bst::booking_status,
-  v.note,
-  now(), now()
-FROM (VALUES
-  ('client1@mail.com',  'specialist1@mail.com', 'Штукатурка стен',       '2026-05-20', 'CONFIRMED', 'Кухня и прихожая'),
-  ('client2@mail.com',  'specialist1@mail.com', 'Укладка плитки',        '2026-05-21', 'CONFIRMED', NULL),
-  ('client3@mail.com',  'specialist1@mail.com', 'Монтаж гипсокартона',   '2026-05-22', 'CONFIRMED', 'Перегородка в спальне'),
-  ('client4@mail.com',  'specialist2@mail.com', 'Стрижка и укладка',     '2026-05-19', 'CONFIRMED', NULL),
-  ('client5@mail.com',  'specialist2@mail.com', 'Окрашивание волос',     '2026-05-20', 'CONFIRMED', 'Мелирование'),
-  ('client6@mail.com',  'specialist2@mail.com', 'Уход за бровями',       '2026-05-21', 'CONFIRMED', NULL),
-  ('client7@mail.com',  'specialist3@mail.com', 'Математика 9-12 класс', '2026-05-19', 'CONFIRMED', NULL),
-  ('client8@mail.com',  'specialist3@mail.com', 'Физика 10-12 класс',    '2026-05-20', 'CONFIRMED', 'Подготовка к BAC'),
-  ('client9@mail.com',  'specialist3@mail.com', 'Подготовка к BAC',      '2026-05-21', 'CONFIRMED', NULL),
-  ('client10@mail.com', 'specialist4@mail.com', 'Разработка лендинга',   '2026-05-18', 'CONFIRMED', 'Сайт для кофейни'),
-  ('client1@mail.com',  'specialist4@mail.com', 'REST API на Spring',    '2026-05-19', 'CONFIRMED', NULL),
-  ('client2@mail.com',  'specialist4@mail.com', 'Консультация по коду',  '2026-05-20', 'CONFIRMED', NULL),
-  ('client3@mail.com',  'specialist5@mail.com', 'Портретная съёмка',     '2026-05-17', 'CONFIRMED', NULL),
-  ('client4@mail.com',  'specialist5@mail.com', 'Съёмка мероприятий',    '2026-05-18', 'CONFIRMED', 'День рождения'),
-  ('client5@mail.com',  'specialist5@mail.com', 'Предметная съёмка',     '2026-05-19', 'CONFIRMED', NULL)
-) AS v(ce, se, svc, sd, bst, note)
-JOIN users cu ON cu.email = v.ce
-JOIN users su ON su.email = v.se
+SELECT pg_catalog.setval('time_slots_id_seq', 109, true);
+
+-- ── Бронирования ──────────────────────────────────────
+INSERT INTO bookings (id, client_id, service_id, time_slot_id, status, note, created_at, updated_at, google_event_id_client, google_event_id_specialist, payment_id) VALUES
+  -- specialist@mail.com — реальные старые бронирования
+  (1,  1,  1,  1,  'COMPLETED'::booking_status, 'Тестовое бронирование', '2026-05-12 13:01:11.675351', '2026-05-12 14:18:01.133769', NULL, NULL, NULL),
+  (2,  6,  3,  2,  'COMPLETED'::booking_status, '',                      '2026-05-13 13:06:02.391362', '2026-05-13 13:16:01.202688', NULL, NULL, NULL),
+  (3,  6,  3,  4,  'COMPLETED'::booking_status, 'Комментарий',           '2026-05-15 12:21:13.480290', '2026-05-15 12:23:53.651862', NULL, NULL, NULL),
+  (15, 6,  4,  7,  'COMPLETED'::booking_status, '111',                   '2026-05-26 17:57:38.223071', '2026-05-26 17:58:47.106047', NULL, NULL, 5),
+  (16, 2,  4,  8,  'COMPLETED'::booking_status, '1111',                  '2026-05-26 18:07:42.598522', '2026-05-26 18:10:54.912491', '363aks7blgvgsbe2f4lhphhghk', '363aks7blgvgsbe2f4lhphhghk', NULL),
+  (17, 6,  3,  9,  'COMPLETED'::booking_status, '4352345',               '2026-05-26 18:11:43.484526', '2026-05-26 18:12:29.593099', NULL, 'hn4bcifknikvk9ltok8s93u9v4', NULL),
+  (18, 6,  3,  13, 'COMPLETED'::booking_status, '13123131',              '2026-05-26 18:15:02.777784', '2026-05-26 18:35:25.378522', NULL, 'opre7ecl87loaig5iaumcfgrr0', 6),
+  (19, 6,  1,  14, 'COMPLETED'::booking_status, '12345678',              '2026-05-26 18:37:02.694059', '2026-05-26 18:41:18.360581', NULL, 'a895fbsip57ijc8b7hr7tlu88s', 7),
+  -- specialist@mail.com — история с 20 февраля (20 заказов)
+  (66, 3,  1,  90, 'CONFIRMED'::booking_status, NULL, '2026-02-20', '2026-02-20', NULL, NULL, NULL),
+  (67, 4,  3,  91, 'CONFIRMED'::booking_status, NULL, '2026-02-25', '2026-02-25', NULL, NULL, NULL),
+  (68, 5,  4,  92, 'CONFIRMED'::booking_status, NULL, '2026-03-02', '2026-03-02', NULL, NULL, NULL),
+  (69, 6,  1,  93, 'CONFIRMED'::booking_status, NULL, '2026-03-07', '2026-03-07', NULL, NULL, NULL),
+  (70, 12, 3,  94, 'CONFIRMED'::booking_status, NULL, '2026-03-12', '2026-03-12', NULL, NULL, NULL),
+  (71, 13, 4,  95, 'CONFIRMED'::booking_status, NULL, '2026-03-17', '2026-03-17', NULL, NULL, NULL),
+  (72, 14, 1,  96, 'CONFIRMED'::booking_status, NULL, '2026-03-22', '2026-03-22', NULL, NULL, NULL),
+  (73, 15, 3,  97, 'CONFIRMED'::booking_status, NULL, '2026-03-27', '2026-03-27', NULL, NULL, NULL),
+  (74, 16, 4,  98, 'CONFIRMED'::booking_status, NULL, '2026-04-01', '2026-04-01', NULL, NULL, NULL),
+  (75, 17, 1,  99, 'CONFIRMED'::booking_status, NULL, '2026-04-06', '2026-04-06', NULL, NULL, NULL),
+  (76, 18, 3,  100, 'CONFIRMED'::booking_status, NULL, '2026-04-11', '2026-04-11', NULL, NULL, NULL),
+  (77, 19, 4,  101, 'CONFIRMED'::booking_status, NULL, '2026-04-16', '2026-04-16', NULL, NULL, NULL),
+  (78, 20, 1,  102, 'CONFIRMED'::booking_status, NULL, '2026-04-21', '2026-04-21', NULL, NULL, NULL),
+  (79, 21, 3,  103, 'CONFIRMED'::booking_status, NULL, '2026-04-26', '2026-04-26', NULL, NULL, NULL),
+  (80, 3,  4,  104, 'CONFIRMED'::booking_status, NULL, '2026-05-01', '2026-05-01', NULL, NULL, NULL),
+  (81, 4,  1,  105, 'CONFIRMED'::booking_status, NULL, '2026-05-06', '2026-05-06', NULL, NULL, NULL),
+  (82, 5,  3,  106, 'CONFIRMED'::booking_status, NULL, '2026-05-11', '2026-05-11', NULL, NULL, NULL),
+  (83, 6,  4,  107, 'CONFIRMED'::booking_status, NULL, '2026-05-16', '2026-05-16', NULL, NULL, NULL),
+  (84, 12, 1,  108, 'CONFIRMED'::booking_status, NULL, '2026-05-21', '2026-05-21', NULL, NULL, NULL),
+  (85, 13, 3,  109, 'CONFIRMED'::booking_status, NULL, '2026-05-26', '2026-05-26', NULL, NULL, NULL),
+  -- specialist1–5 бронирования
+  (21, 14, 7,  15, 'CONFIRMED'::booking_status, 'Перегородка в спальне', '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (22, 13, 6,  16, 'CONFIRMED'::booking_status, NULL, '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (23, 12, 5,  17, 'CONFIRMED'::booking_status, 'Кухня и прихожая', '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (24, 17, 10, 21, 'CONFIRMED'::booking_status, NULL, '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (25, 16, 9,  22, 'CONFIRMED'::booking_status, 'Мелирование', '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (26, 15, 8,  23, 'CONFIRMED'::booking_status, NULL, '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (27, 20, 13, 27, 'CONFIRMED'::booking_status, NULL, '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (28, 19, 12, 28, 'CONFIRMED'::booking_status, 'Подготовка к BAC', '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (29, 18, 11, 29, 'CONFIRMED'::booking_status, NULL, '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (30, 21, 14, 35, 'CONFIRMED'::booking_status, 'Сайт для кофейни', '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (31, 13, 16, 33, 'CONFIRMED'::booking_status, NULL, '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (32, 12, 15, 34, 'CONFIRMED'::booking_status, NULL, '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (33, 16, 19, 39, 'CONFIRMED'::booking_status, NULL, '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (34, 15, 18, 40, 'CONFIRMED'::booking_status, 'День рождения', '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL),
+  (35, 14, 17, 41, 'CONFIRMED'::booking_status, NULL, '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL)
 ON CONFLICT DO NOTHING;
+
+SELECT pg_catalog.setval('bookings_id_seq', 85, true);
 
 -- ── Отзывы ────────────────────────────────────────────
-INSERT INTO reviews (booking_id, client_id, specialist_id, rating, text, status, created_at, updated_at)
-SELECT b.id, cu.id, sp.id, v.rating, v.txt, 'APPROVED'::review_status, now(), now()
-FROM (VALUES
-  ('client1@mail.com',  'specialist1@mail.com', 5, 'Отличная работа, всё аккуратно.'),
-  ('client2@mail.com',  'specialist1@mail.com', 4, 'Хорошо, чуть дольше запланированного.'),
-  ('client3@mail.com',  'specialist1@mail.com', 5, 'Мастер своего дела, рекомендую.'),
-  ('client4@mail.com',  'specialist2@mail.com', 5, 'Мария — профессионал, результат отличный.'),
-  ('client5@mail.com',  'specialist2@mail.com', 4, 'Хорошо, немного затянулось.'),
-  ('client6@mail.com',  'specialist2@mail.com', 5, 'Очень довольна, буду ещё.'),
-  ('client7@mail.com',  'specialist3@mail.com', 5, 'Виктор объясняет понятно, сдал на 9.'),
-  ('client8@mail.com',  'specialist3@mail.com', 5, 'Лучший репетитор, рекомендую.'),
-  ('client9@mail.com',  'specialist3@mail.com', 4, 'Задания подобраны по уровню.'),
-  ('client10@mail.com', 'specialist4@mail.com', 5, 'Сайт готов в срок, код чистый.'),
-  ('client1@mail.com',  'specialist4@mail.com', 4, 'Хорошая консультация, много полезного.'),
-  ('client3@mail.com',  'specialist5@mail.com', 5, 'Фото получились восхитительно.'),
-  ('client4@mail.com',  'specialist5@mail.com', 5, 'Дмитрий — мастер, все гости в восторге.')
-) AS v(ce, se, rating, txt)
-JOIN users cu ON cu.email = v.ce
-JOIN users su ON su.email = v.se
-JOIN specialist_profiles sp ON sp.user_id = su.id
-JOIN bookings b ON b.client_id = cu.id
-  AND b.service_id IN (SELECT id FROM services WHERE specialist_id = sp.id)
+INSERT INTO reviews (id, booking_id, client_id, specialist_id, rating, text, reply, status, created_at, updated_at) VALUES
+  (1,  1,  1,  1, 5, 'Отличный специалист, всё сделал быстро и качественно!', NULL, 'APPROVED'::review_status, '2026-05-12 14:20:36.119802', '2026-05-12 14:20:36.119827'),
+  -- отзывы specialist1–5
+  (2,  21, 14, 2, 5, 'Мастер своего дела, рекомендую.',                    NULL, 'APPROVED'::review_status, '2026-05-26 16:00:22.411853', '2026-05-26 16:00:22.411853'),
+  (3,  22, 13, 2, 4, 'Хорошо, чуть дольше запланированного.',              NULL, 'APPROVED'::review_status, '2026-05-26 16:00:22.411853', '2026-05-26 16:00:22.411853'),
+  (4,  23, 12, 2, 5, 'Отличная работа, всё аккуратно.',                    NULL, 'APPROVED'::review_status, '2026-05-26 16:00:22.411853', '2026-05-26 16:00:22.411853'),
+  (5,  24, 17, 3, 5, 'Очень довольна, буду ещё.',                          NULL, 'APPROVED'::review_status, '2026-05-26 16:00:22.411853', '2026-05-26 16:00:22.411853'),
+  (6,  25, 16, 3, 4, 'Хорошо, немного затянулось.',                        NULL, 'APPROVED'::review_status, '2026-05-26 16:00:22.411853', '2026-05-26 16:00:22.411853'),
+  (7,  26, 15, 3, 5, 'Мария — профессионал, результат отличный.',          NULL, 'APPROVED'::review_status, '2026-05-26 16:00:22.411853', '2026-05-26 16:00:22.411853'),
+  (8,  27, 20, 4, 4, 'Задания подобраны по уровню.',                       NULL, 'APPROVED'::review_status, '2026-05-26 16:00:22.411853', '2026-05-26 16:00:22.411853'),
+  (9,  28, 19, 4, 5, 'Лучший репетитор, рекомендую.',                      NULL, 'APPROVED'::review_status, '2026-05-26 16:00:22.411853', '2026-05-26 16:00:22.411853'),
+  (10, 29, 18, 4, 5, 'Виктор объясняет понятно, сдал на 9.',               NULL, 'APPROVED'::review_status, '2026-05-26 16:00:22.411853', '2026-05-26 16:00:22.411853'),
+  (11, 30, 21, 5, 5, 'Сайт готов в срок, код чистый.',                     NULL, 'APPROVED'::review_status, '2026-05-26 16:00:22.411853', '2026-05-26 16:00:22.411853'),
+  (12, 32, 12, 5, 4, 'Хорошая консультация, много полезного.',             NULL, 'APPROVED'::review_status, '2026-05-26 16:00:22.411853', '2026-05-26 16:00:22.411853'),
+  (13, 34, 15, 6, 5, 'Дмитрий — мастер, все гости в восторге.',           NULL, 'APPROVED'::review_status, '2026-05-26 16:00:22.411853', '2026-05-26 16:00:22.411853'),
+  (14, 35, 14, 6, 5, 'Фото получились восхитительно.',                     NULL, 'APPROVED'::review_status, '2026-05-26 16:00:22.411853', '2026-05-26 16:00:22.411853'),
+  -- отзывы specialist@mail.com — история с февраля
+  (42, 66, 3,  1, 5, 'Отличный специалист, рекомендую.',        NULL, 'APPROVED'::review_status, '2026-02-20', '2026-02-20'),
+  (43, 67, 4,  1, 5, 'Починил с первого раза, доволен.',        NULL, 'APPROVED'::review_status, '2026-02-25', '2026-02-25'),
+  (44, 68, 5,  1, 5, 'Профессиональный подход, спасибо.',       NULL, 'APPROVED'::review_status, '2026-03-02', '2026-03-02'),
+  (45, 69, 6,  1, 4, 'Работа выполнена в срок.',                NULL, 'APPROVED'::review_status, '2026-03-07', '2026-03-07'),
+  (46, 70, 12, 1, 4, 'Хорошее обслуживание, приду ещё.',        NULL, 'APPROVED'::review_status, '2026-03-12', '2026-03-12'),
+  (47, 71, 13, 1, 5, 'Всё сделано быстро и качественно.',       NULL, 'APPROVED'::review_status, '2026-03-17', '2026-03-17'),
+  (48, 72, 14, 1, 5, 'Отличный специалист, рекомендую.',        NULL, 'APPROVED'::review_status, '2026-03-22', '2026-03-22'),
+  (49, 73, 15, 1, 5, 'Починил с первого раза, доволен.',        NULL, 'APPROVED'::review_status, '2026-03-27', '2026-03-27'),
+  (50, 74, 16, 1, 4, 'Профессиональный подход, спасибо.',       NULL, 'APPROVED'::review_status, '2026-04-01', '2026-04-01'),
+  (51, 75, 17, 1, 4, 'Работа выполнена в срок.',                NULL, 'APPROVED'::review_status, '2026-04-06', '2026-04-06'),
+  (52, 76, 18, 1, 5, 'Хорошее обслуживание, приду ещё.',        NULL, 'APPROVED'::review_status, '2026-04-11', '2026-04-11'),
+  (53, 77, 19, 1, 5, 'Всё сделано быстро и качественно.',       NULL, 'APPROVED'::review_status, '2026-04-16', '2026-04-16'),
+  (54, 78, 20, 1, 5, 'Отличный специалист, рекомендую.',        NULL, 'APPROVED'::review_status, '2026-04-21', '2026-04-21'),
+  (55, 79, 21, 1, 4, 'Починил с первого раза, доволен.',        NULL, 'APPROVED'::review_status, '2026-04-26', '2026-04-26'),
+  (56, 80, 3,  1, 4, 'Профессиональный подход, спасибо.',       NULL, 'APPROVED'::review_status, '2026-05-01', '2026-05-01'),
+  (57, 81, 4,  1, 5, 'Работа выполнена в срок.',                NULL, 'APPROVED'::review_status, '2026-05-06', '2026-05-06'),
+  (58, 82, 5,  1, 5, 'Хорошее обслуживание, приду ещё.',        NULL, 'APPROVED'::review_status, '2026-05-11', '2026-05-11'),
+  (59, 83, 6,  1, 5, 'Всё сделано быстро и качественно.',       NULL, 'APPROVED'::review_status, '2026-05-16', '2026-05-16'),
+  (60, 84, 12, 1, 4, 'Отличный специалист, рекомендую.',        NULL, 'APPROVED'::review_status, '2026-05-21', '2026-05-21'),
+  (61, 85, 13, 1, 4, 'Починил с первого раза, доволен.',        NULL, 'APPROVED'::review_status, '2026-05-26', '2026-05-26')
 ON CONFLICT DO NOTHING;
 
--- ── Заказы на доске (12 открытых + 2 закрытых) ────────
-INSERT INTO orders (client_id, category_id, title, description, budget, desired_date, status, created_at, updated_at)
-SELECT cu.id, c.id, v.title, v.descr, v.budget::numeric, v.dd::date, v.ost::order_status, now(), now()
-FROM (VALUES
-  ('client1@mail.com',  'Ремонт и строительство', 'Покраска потолков',      'Две комнаты ~30 кв.м.',           '200.00', '2026-06-10', 'OPEN'),
-  ('client2@mail.com',  'Красота и уход',          'Свадебная причёска',     'Выезд на дом утром.',             '300.00', '2026-06-15', 'OPEN'),
-  ('client3@mail.com',  'Репетиторство',           'Английский для ребёнка', '8 лет, уровень A1.',              '150.00', '2026-06-05', 'OPEN'),
-  ('client4@mail.com',  'IT и технологии',         'Telegram-бот',           'Простой бот для записи.',         '500.00', '2026-06-20', 'OPEN'),
-  ('client5@mail.com',  'Фото и видео',            'Фото для резюме',        'Бизнес-портрет, 1 час.',          '200.00', '2026-06-08', 'OPEN'),
-  ('client6@mail.com',  'Ремонт и строительство',  'Установка дверей',       'Три межкомнатные двери.',         '350.00', '2026-06-12', 'OPEN'),
-  ('client7@mail.com',  'Красота и уход',          'Маникюр и педикюр',      'Гель-лак, любой цвет.',           '120.00', '2026-06-04', 'OPEN'),
-  ('client8@mail.com',  'Репетиторство',           'Химия для поступления',  'ВУЗ, интенсивный курс.',          '400.00', '2026-06-18', 'OPEN'),
-  ('client9@mail.com',  'IT и технологии',         'Настройка Wi-Fi дома',   'Роутер и 3 точки доступа.',       '150.00', '2026-06-03', 'OPEN'),
-  ('client10@mail.com', 'Фото и видео',            'Видео с корпоратива',    'Монтаж ролика до 5 минут.',       '600.00', '2026-06-25', 'OPEN'),
-  ('client1@mail.com',  'IT и технологии',         'Верстка email-шаблона',  'HTML, адаптив для Gmail.',        '250.00', '2026-06-07', 'OPEN'),
-  ('client2@mail.com',  'Ремонт и строительство',  'Укладка ламината',       '~20 кв.м., материал есть.',      '280.00', '2026-06-14', 'OPEN'),
-  ('client3@mail.com',  'Красота и уход',          'Окрашивание ресниц',     'Хна, брови и ресницы.',            '70.00', '2026-05-28', 'CLOSED'),
-  ('client4@mail.com',  'Репетиторство',           'История для BAC',        'Остался месяц до экзамена.',      '180.00', '2026-05-25', 'CLOSED')
-) AS v(ce, cat, title, descr, budget, dd, ost)
-JOIN users cu ON cu.email = v.ce
-JOIN categories c ON c.name = v.cat
+SELECT pg_catalog.setval('reviews_id_seq', 61, true);
+
+-- ── Заказы ────────────────────────────────────────────
+INSERT INTO orders (id, client_id, category_id, title, description, budget, desired_date, status, created_at, updated_at) VALUES
+  (1,  1,  1, 'Нужен ремонт ноутбука',                 'Не включается после падения',     200.00, '2026-05-20', 'IN_PROGRESS'::order_status, '2026-05-12 15:54:37.530240', '2026-05-12 15:57:58.869301'),
+  (2,  6,  1, 'Нужно смазать петли у стиральной машины','lorem ipsum',                     300.00, '2026-05-16', 'CLOSED'::order_status,      '2026-05-15 12:21:55.315250', '2026-05-26 18:45:04.340426'),
+  (3,  2,  1, 'Отремонтировать генератор',              '11111',                          4000.00, '2026-05-28', 'CLOSED'::order_status,      '2026-05-26 18:03:15.094024', '2026-05-26 18:45:08.321140'),
+  (4,  17, 2, 'Установка дверей',                       'Три межкомнатные двери.',         350.00, '2026-06-12', 'OPEN'::order_status,        '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515'),
+  (5,  13, 2, 'Укладка ламината',                       '~20 кв.м., материал есть.',       280.00, '2026-06-14', 'OPEN'::order_status,        '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515'),
+  (6,  12, 2, 'Покраска потолков',                      'Две комнаты ~30 кв.м.',           200.00, '2026-06-10', 'OPEN'::order_status,        '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515'),
+  (7,  18, 3, 'Маникюр и педикюр',                      'Гель-лак, любой цвет.',           120.00, '2026-06-04', 'OPEN'::order_status,        '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515'),
+  (8,  14, 3, 'Окрашивание ресниц',                     'Хна, брови и ресницы.',            70.00, '2026-05-28', 'CLOSED'::order_status,      '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515'),
+  (9,  13, 3, 'Свадебная причёска',                     'Выезд на дом утром.',             300.00, '2026-06-15', 'OPEN'::order_status,        '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515'),
+  (10, 19, 4, 'Химия для поступления',                  'ВУЗ, интенсивный курс.',          400.00, '2026-06-18', 'OPEN'::order_status,        '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515'),
+  (11, 15, 4, 'История для BAC',                        'Остался месяц до экзамена.',      180.00, '2026-05-25', 'CLOSED'::order_status,      '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515'),
+  (12, 14, 4, 'Английский для ребёнка',                 '8 лет, уровень A1.',              150.00, '2026-06-05', 'OPEN'::order_status,        '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515'),
+  (13, 20, 5, 'Настройка Wi-Fi дома',                   'Роутер и 3 точки доступа.',       150.00, '2026-06-03', 'OPEN'::order_status,        '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515'),
+  (14, 15, 5, 'Telegram-бот',                           'Простой бот для записи.',         500.00, '2026-06-20', 'OPEN'::order_status,        '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515'),
+  (15, 12, 5, 'Верстка email-шаблона',                  'HTML, адаптив для Gmail.',        250.00, '2026-06-07', 'OPEN'::order_status,        '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515'),
+  (16, 21, 6, 'Видео с корпоратива',                    'Монтаж ролика до 5 минут.',       600.00, '2026-06-25', 'OPEN'::order_status,        '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515'),
+  (17, 16, 6, 'Фото для резюме',                        'Бизнес-портрет, 1 час.',          200.00, '2026-06-08', 'OPEN'::order_status,        '2026-05-26 16:00:22.415515', '2026-05-26 16:00:22.415515')
 ON CONFLICT DO NOTHING;
+
+SELECT pg_catalog.setval('orders_id_seq', 31, true);
+SELECT pg_catalog.setval('categories_id_seq', 16, true);
