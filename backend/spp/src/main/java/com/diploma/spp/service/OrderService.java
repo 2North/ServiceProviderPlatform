@@ -76,10 +76,14 @@ public class OrderService {
                 .specialist(specialist)
                 .proposedPrice(dto.getProposedPrice())
                 .message(dto.getMessage())
-                .status(ResponseStatus.PENDING)
+                .status(ResponseStatus.ACCEPTED)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+
+        order.setStatus(OrderStatus.CLOSED);
+        order.setUpdatedAt(LocalDateTime.now());
+        orderRepository.save(order);
 
         return toResponseDto(orderResponseRepository.save(response));
     }
