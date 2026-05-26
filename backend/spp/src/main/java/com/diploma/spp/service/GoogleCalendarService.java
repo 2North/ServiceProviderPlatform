@@ -48,6 +48,7 @@ public class GoogleCalendarService {
         return flow.newAuthorizationUrl()
                 .setRedirectUri(properties.getOauth().getRedirectUri())
                 .setState(String.valueOf(userId))
+                .set("prompt", "consent")
                 .build();
     }
 
@@ -67,7 +68,13 @@ public class GoogleCalendarService {
                         .connectedAt(LocalDateTime.now())
                         .build());
 
-        integration.setRefreshToken(encryptor.encrypt(tokenResponse.getRefreshToken()));
+        if (tokenResponse.getRefreshToken() != null) {
+            integration.setRefreshToken(encryptor.encrypt(tokenResponse.getRefreshToken()));
+        }
+        if (integration.getRefreshToken() == null) {
+            log.warn("No refresh token received for user {} and no existing token — skipping save", userId);
+            return;
+        }
         integration.setAccessToken(encryptor.encrypt(tokenResponse.getAccessToken()));
         integration.setTokenExpiresAt(LocalDateTime.now().plusSeconds(
                 tokenResponse.getExpiresInSeconds() != null ? tokenResponse.getExpiresInSeconds() : 3600));
