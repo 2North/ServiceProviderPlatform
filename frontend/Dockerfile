@@ -4,7 +4,9 @@ COPY package*.json ./
 RUN npm ci
 COPY . .
 ARG VITE_API_URL
+ARG VITE_STRIPE_PK
 ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_STRIPE_PK=$VITE_STRIPE_PK
 RUN npm run build
 
 FROM nginx:alpine
