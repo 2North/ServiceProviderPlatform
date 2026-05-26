@@ -109,7 +109,7 @@ function BookingPage() {
                 <option value="">— Выберите услугу —</option>
                 {services.filter(s => s.active !== false).map(s => (
                   <option key={s.id} value={s.id}>
-                    {s.title} — {s.price} MDL ({s.duration} мин)
+                    {s.title} — {s.price} EUR ({s.duration} мин)
                   </option>
                 ))}
               </select>

@@ -57,7 +57,7 @@ function CreateOrderForm({ categories, clientId, onSuccess, onCancel }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
-          <label htmlFor="order-budget" style={labelStyle}>Бюджет (MDL)</label>
+          <label htmlFor="order-budget" style={labelStyle}>Бюджет (EUR)</label>
           <input id="order-budget" type="number" min="0" step="0.01" value={form.budget} onChange={e => setForm(p => ({ ...p, budget: e.target.value }))} placeholder="0.00" required />
         </div>
         <div>
@@ -123,7 +123,7 @@ function RespondForm({ orderId, specialistId, onSuccess, onCancel }) {
     >
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
-          <label htmlFor={`respond-price-${orderId}`} style={labelStyle}>Предлагаемая цена (MDL)</label>
+          <label htmlFor={`respond-price-${orderId}`} style={labelStyle}>Предлагаемая цена (EUR)</label>
           <input id={`respond-price-${orderId}`} type="number" min="0" step="0.01" value={form.proposedPrice} onChange={e => setForm(p => ({ ...p, proposedPrice: e.target.value }))} placeholder="0.00" required />
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -166,7 +166,7 @@ function OrderCard({ order, categories, role, specialistProfileId }) {
           )}
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
             {order.budget != null && (
-              <span style={{ color: '#6ee7b7', fontWeight: 700, fontSize: 15 }}>{order.budget} MDL</span>
+              <span style={{ color: '#6ee7b7', fontWeight: 700, fontSize: 15 }}>{order.budget} EUR</span>
             )}
             {order.desiredDate && (
               <span style={{ color: 'rgba(226,232,240,0.45)', fontSize: 13 }}>{order.desiredDate}</span>

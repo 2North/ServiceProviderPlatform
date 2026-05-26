@@ -177,7 +177,7 @@ function ServiceForm({ initial, categories, specialistProfileId, onSuccess, onCa
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
-          <label htmlFor="sf-price" style={labelStyle}>Цена (MDL)</label>
+          <label htmlFor="sf-price" style={labelStyle}>Цена (EUR)</label>
           <input
             id="sf-price"
             name="price"
@@ -831,7 +831,7 @@ function DashboardPage() {
                       )}
                       <div style={{ display: 'flex', gap: 16 }}>
                         <span style={{ color: '#6ee7b7', fontWeight: 700, fontSize: 15 }}>
-                          {service.price} MDL
+                          {service.price} EUR
                         </span>
                         <span style={{ color: 'rgba(226,232,240,0.5)', fontSize: 13 }}>
                           {service.duration} мин
@@ -1001,7 +1001,7 @@ function DashboardPage() {
               { label: 'Завершено', value: analytics.completedBookings ?? '—', color: '#4ade80' },
               { label: 'Отменено', value: analytics.cancelledBookings ?? '—', color: '#f87171' },
               { label: 'Средний рейтинг', value: analytics.averageRating != null ? analytics.averageRating.toFixed(1) : '—', color: '#fbbf24' },
-              { label: 'Доход (MDL)', value: analytics.totalEarnings != null ? analytics.totalEarnings.toFixed(0) : '—', color: '#6ee7b7' },
+              { label: 'Доход (EUR)', value: analytics.totalEarnings != null ? analytics.totalEarnings.toFixed(0) : '—', color: '#6ee7b7' },
             ].map(({ label, value, color }) => (
               <div key={label} style={{ padding: '20px 18px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <span style={{ color: 'rgba(226,232,240,0.45)', fontSize: 12, lineHeight: 1.4 }}>{label}</span>

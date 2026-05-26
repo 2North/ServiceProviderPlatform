@@ -84,7 +84,7 @@ function ServiceCard({ service }) {
             Цена
           </span>
           <span style={{ color: '#6ee7b7', fontWeight: 700, fontSize: 18 }}>
-            {service.price} <span style={{ fontSize: 12, fontWeight: 400 }}>MDL</span>
+            {service.price} <span style={{ fontSize: 12, fontWeight: 400 }}>EUR</span>
           </span>
         </div>
         <div>
