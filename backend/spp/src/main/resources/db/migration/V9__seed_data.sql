@@ -138,10 +138,13 @@ INSERT INTO time_slots (id, specialist_id, slot_date, start_time, end_time, stat
   (41, 6, '2026-05-17', '11:00', '12:00', 'BOOKED'::slot_status,     '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
   (42, 6, '2026-06-08', '11:00', '12:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
   (43, 6, '2026-06-07', '11:00', '12:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
-  (44, 6, '2026-06-06', '11:00', '12:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495')
+  (44,  6, '2026-06-06', '11:00', '12:00', 'AVAILABLE'::slot_status,  '2026-05-26 16:00:22.406495', '2026-05-26 16:00:22.406495'),
+  (113, 1, '2026-05-27', '18:00', '20:00', 'BOOKED'::slot_status,    NOW(), NOW()),
+  (115, 1, '2026-05-27', '12:00', '14:00', 'BOOKED'::slot_status,    NOW(), NOW()),
+  (116, 1, '2026-05-29', '15:00', '18:00', 'BOOKED'::slot_status,    NOW(), NOW())
 ON CONFLICT DO NOTHING;
 
-SELECT pg_catalog.setval('time_slots_id_seq', 109, true);
+SELECT pg_catalog.setval('time_slots_id_seq', 116, true);
 
 -- ── Бронирования ──────────────────────────────────────
 INSERT INTO bookings (id, client_id, service_id, time_slot_id, status, note, created_at, updated_at, google_event_id_client, google_event_id_specialist, payment_id) VALUES
@@ -149,11 +152,11 @@ INSERT INTO bookings (id, client_id, service_id, time_slot_id, status, note, cre
   (1,  1,  1,  1,  'COMPLETED'::booking_status, 'Тестовое бронирование', '2026-05-12 13:01:11.675351', '2026-05-12 14:18:01.133769', NULL, NULL, NULL),
   (2,  6,  3,  2,  'COMPLETED'::booking_status, '',                      '2026-05-13 13:06:02.391362', '2026-05-13 13:16:01.202688', NULL, NULL, NULL),
   (3,  6,  3,  4,  'COMPLETED'::booking_status, 'Комментарий',           '2026-05-15 12:21:13.480290', '2026-05-15 12:23:53.651862', NULL, NULL, NULL),
-  (15, 6,  4,  7,  'COMPLETED'::booking_status, '111',                   '2026-05-26 17:57:38.223071', '2026-05-26 17:58:47.106047', NULL, NULL, 5),
+  (15, 6,  4,  7,  'COMPLETED'::booking_status, '111',                   '2026-05-26 17:57:38.223071', '2026-05-26 17:58:47.106047', NULL, NULL, NULL),
   (16, 2,  4,  8,  'COMPLETED'::booking_status, '1111',                  '2026-05-26 18:07:42.598522', '2026-05-26 18:10:54.912491', '363aks7blgvgsbe2f4lhphhghk', '363aks7blgvgsbe2f4lhphhghk', NULL),
   (17, 6,  3,  9,  'COMPLETED'::booking_status, '4352345',               '2026-05-26 18:11:43.484526', '2026-05-26 18:12:29.593099', NULL, 'hn4bcifknikvk9ltok8s93u9v4', NULL),
-  (18, 6,  3,  13, 'COMPLETED'::booking_status, '13123131',              '2026-05-26 18:15:02.777784', '2026-05-26 18:35:25.378522', NULL, 'opre7ecl87loaig5iaumcfgrr0', 6),
-  (19, 6,  1,  14, 'COMPLETED'::booking_status, '12345678',              '2026-05-26 18:37:02.694059', '2026-05-26 18:41:18.360581', NULL, 'a895fbsip57ijc8b7hr7tlu88s', 7),
+  (18, 6,  3,  13, 'COMPLETED'::booking_status, '13123131',              '2026-05-26 18:15:02.777784', '2026-05-26 18:35:25.378522', NULL, 'opre7ecl87loaig5iaumcfgrr0', NULL),
+  (19, 6,  1,  14, 'COMPLETED'::booking_status, '12345678',              '2026-05-26 18:37:02.694059', '2026-05-26 18:41:18.360581', NULL, 'a895fbsip57ijc8b7hr7tlu88s', NULL),
   -- specialist@mail.com — история с 20 февраля (20 заказов)
   (66, 3,  1,  90, 'CONFIRMED'::booking_status, NULL, '2026-02-20', '2026-02-20', NULL, NULL, NULL),
   (67, 4,  3,  91, 'CONFIRMED'::booking_status, NULL, '2026-02-25', '2026-02-25', NULL, NULL, NULL),
@@ -193,7 +196,32 @@ INSERT INTO bookings (id, client_id, service_id, time_slot_id, status, note, cre
   (35, 14, 17, 41, 'CONFIRMED'::booking_status, NULL, '2026-05-26 16:00:22.409227', '2026-05-26 16:00:22.409227', NULL, NULL, NULL)
 ON CONFLICT DO NOTHING;
 
-SELECT pg_catalog.setval('bookings_id_seq', 85, true);
+INSERT INTO bookings (id, client_id, service_id, time_slot_id, status, note, created_at, updated_at, google_event_id_client, google_event_id_specialist, payment_id) VALUES
+  (86, 6,  3,  113, 'COMPLETED'::booking_status, 'fsdfasf',    '2026-05-26 21:06:48.919389', '2026-05-26 21:08:44.243877', NULL, 'jr5hp4tjhbnodskoohk6bvemsk', NULL),
+  (88, 6,  3,  115, 'COMPLETED'::booking_status, '34234',      '2026-05-26 22:05:56.38956',  '2026-05-26 22:07:25.605057', NULL, 'bho0rotpca560g3qh11rfbitos', NULL),
+  (89, 6,  4,  116, 'CONFIRMED'::booking_status, '324234234',  '2026-05-26 22:08:16.772832', '2026-05-26 22:08:33.387663', NULL, '1thsanh82k76h4rd0tmiqnat0k', NULL)
+ON CONFLICT DO NOTHING;
+
+SELECT pg_catalog.setval('bookings_id_seq', 89, true);
+
+-- ── Платежи (после всех bookings из-за circular FK) ──
+INSERT INTO payments (id, booking_id, amount, currency, status, stripe_payment_intent_id, stripe_client_secret, created_at, updated_at) VALUES
+  (5,  15, 400.00, 'eur', 'SUCCEEDED'::payment_status, 'pi_3TbMQMBQU3E14yIu0HeRCmcl', 'pi_3TbMQMBQU3E14yIu0HeRCmcl_secret_kze2l67AwpIhCINgyq7peb6p3', '2026-05-26 17:57:43.170223', '2026-05-26 17:57:43.170223'),
+  (6,  18, 400.00, 'eur', 'SUCCEEDED'::payment_status, 'pi_3TbMhCBQU3E14yIu1R7Bpgg4', 'pi_3TbMhCBQU3E14yIu1R7Bpgg4_secret_nkZLbWZTO1RqJ7gPkaYFyvX0H', '2026-05-26 18:15:06.559781', '2026-05-26 18:15:06.559781'),
+  (7,  19, 150.00, 'eur', 'SUCCEEDED'::payment_status, 'pi_3TbN2WBQU3E14yIu2G5qdDld', 'pi_3TbN2WBQU3E14yIu2G5qdDld_secret_lWsMEx0VDnZWD8siXx5klg63v', '2026-05-26 18:37:08.735319', '2026-05-26 18:37:08.735319'),
+  (8,  86, 400.00, 'eur', 'SUCCEEDED'::payment_status, 'pi_3TbPNVBQU3E14yIu0ttCohtP', 'pi_3TbPNVBQU3E14yIu0ttCohtP_secret_kUH2IGgjyUPlkeD05ihcIlf3B', '2026-05-26 21:06:57.645456', '2026-05-26 21:06:57.645456'),
+  (9,  88, 400.00, 'eur', 'SUCCEEDED'::payment_status, 'pi_3TbQIeBQU3E14yIu0NToqLZo', 'pi_3TbQIeBQU3E14yIu0NToqLZo_secret_iMuaxeecTY26GwYYEny8lruLJ', '2026-05-26 22:06:01.061396', '2026-05-26 22:06:01.061396'),
+  (10, 89, 400.00, 'eur', 'SUCCEEDED'::payment_status, 'pi_3TbQKwBQU3E14yIu2t2LmWhC', 'pi_3TbQKwBQU3E14yIu2t2LmWhC_secret_hLXJACOEmHMhZcTwLZaRbQfcP', '2026-05-26 22:08:22.857469', '2026-05-26 22:08:22.857469')
+ON CONFLICT DO NOTHING;
+
+UPDATE bookings SET payment_id = 5  WHERE id = 15 AND payment_id IS NULL;
+UPDATE bookings SET payment_id = 6  WHERE id = 18 AND payment_id IS NULL;
+UPDATE bookings SET payment_id = 7  WHERE id = 19 AND payment_id IS NULL;
+UPDATE bookings SET payment_id = 8  WHERE id = 86 AND payment_id IS NULL;
+UPDATE bookings SET payment_id = 9  WHERE id = 88 AND payment_id IS NULL;
+UPDATE bookings SET payment_id = 10 WHERE id = 89 AND payment_id IS NULL;
+
+SELECT pg_catalog.setval('payments_id_seq', 10, true);
 
 -- ── Отзывы ────────────────────────────────────────────
 INSERT INTO reviews (id, booking_id, client_id, specialist_id, rating, text, reply, status, created_at, updated_at) VALUES
