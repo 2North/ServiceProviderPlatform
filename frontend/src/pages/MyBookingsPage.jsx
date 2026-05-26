@@ -245,8 +245,8 @@ export default function MyBookingsPage() {
     showToast('success', 'Оплата прошла успешно!')
   }
 
-  const active = bookings.filter(b => !['COMPLETED', 'CANCELLED'].includes(b.status))
-  const past = bookings.filter(b => ['COMPLETED', 'CANCELLED'].includes(b.status))
+  const active = bookings.filter(b => !['CONFIRMED', 'COMPLETED', 'CANCELLED'].includes(b.status))
+  const past = bookings.filter(b => ['CONFIRMED', 'COMPLETED', 'CANCELLED'].includes(b.status))
 
   return (
     <div style={{ maxWidth: 820, margin: '0 auto', padding: '40px 24px' }}>
