@@ -11,8 +11,6 @@ const STRIPE_APPEARANCE = {
     colorDanger: '#f43f5e',
     fontFamily: '"DM Sans", system-ui, sans-serif',
     borderRadius: '8px',
-    colorInputBackground: 'rgba(255,255,255,0.05)',
-    colorInputBorder: 'rgba(255,255,255,0.12)',
     focusBoxShadow: '0 0 0 2px rgba(99,102,241,0.35)',
   },
 }

@@ -3,6 +3,8 @@ package com.diploma.spp.service;
 import com.diploma.spp.config.StripeProperties;
 import com.diploma.spp.dto.PaymentDto;
 import com.diploma.spp.dto.PaymentIntentResponse;
+import com.diploma.spp.event.BookingCancelledEvent;
+import com.diploma.spp.event.BookingConfirmedEvent;
 import com.diploma.spp.exception.ResourceNotFoundException;
 import com.diploma.spp.model.Booking;
 import com.diploma.spp.model.BookingStatus;
@@ -10,6 +12,7 @@ import com.diploma.spp.model.Payment;
 import com.diploma.spp.model.PaymentStatus;
 import com.diploma.spp.repository.BookingRepository;
 import com.diploma.spp.repository.PaymentRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.model.Refund;
@@ -31,6 +34,7 @@ public class StripePaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final StripeProperties stripeProperties;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public PaymentIntentResponse createPaymentIntent(Booking booking) throws StripeException {
@@ -89,6 +93,7 @@ public class StripePaymentService {
         booking.setUpdatedAt(LocalDateTime.now());
         bookingRepository.save(booking);
 
+        eventPublisher.publishEvent(new BookingConfirmedEvent(this, booking));
         log.info("Payment {} succeeded for booking {}", payment.getId(), booking.getId());
     }
 

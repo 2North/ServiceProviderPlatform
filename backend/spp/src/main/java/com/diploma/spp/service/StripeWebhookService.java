@@ -5,12 +5,11 @@ import com.diploma.spp.model.Payment;
 import com.diploma.spp.model.PaymentEvent;
 import com.diploma.spp.repository.PaymentEventRepository;
 import com.diploma.spp.repository.PaymentRepository;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.stripe.exception.SignatureVerificationException;
-import com.stripe.model.PaymentIntent;
 import com.stripe.net.Webhook;
 import com.stripe.model.Event;
-import com.stripe.model.EventDataObjectDeserializer;
-import com.stripe.model.StripeObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,37 +41,61 @@ public class StripeWebhookService {
         }
 
         String type = event.getType();
-        EventDataObjectDeserializer deserializer = event.getDataObjectDeserializer();
-        Optional<StripeObject> stripeObject = deserializer.getObject();
+        String paymentIntentId = extractPaymentIntentId(event);
 
         switch (type) {
-            case "payment_intent.succeeded" -> stripeObject
-                    .filter(o -> o instanceof PaymentIntent)
-                    .map(o -> (PaymentIntent) o)
-                    .ifPresent(pi -> {
-                        paymentService.confirmPaymentSucceeded(pi.getId());
-                        recordEvent(event, pi.getId());
-                    });
-
-            case "payment_intent.payment_failed" -> stripeObject
-                    .filter(o -> o instanceof PaymentIntent)
-                    .map(o -> (PaymentIntent) o)
-                    .ifPresent(pi -> {
-                        paymentService.markPaymentFailed(pi.getId());
-                        recordEvent(event, pi.getId());
-                    });
-
-            case "charge.refunded" -> {
-                // charge.refunded carries a Charge object; get payment intent id from metadata
-                stripeObject.ifPresent(o -> {
-                    if (o instanceof com.stripe.model.Charge charge) {
-                        paymentService.markRefunded(charge.getPaymentIntent());
-                        recordEventByCharge(event, charge.getPaymentIntent());
-                    }
-                });
+            case "payment_intent.succeeded" -> {
+                if (paymentIntentId != null) {
+                    paymentService.confirmPaymentSucceeded(paymentIntentId);
+                    recordEvent(event, paymentIntentId);
+                }
             }
-
+            case "payment_intent.payment_failed" -> {
+                if (paymentIntentId != null) {
+                    paymentService.markPaymentFailed(paymentIntentId);
+                    recordEvent(event, paymentIntentId);
+                }
+            }
+            case "charge.refunded" -> {
+                String piId = extractPaymentIntentIdFromCharge(event);
+                if (piId != null) {
+                    paymentService.markRefunded(piId);
+                    recordEventByCharge(event, piId);
+                }
+            }
             default -> log.debug("Unhandled Stripe event type: {}", type);
+        }
+    }
+
+    private JsonObject getDataObject(Event event) {
+        try {
+            JsonObject root = JsonParser.parseString(event.toJson()).getAsJsonObject();
+            return root.getAsJsonObject("data").getAsJsonObject("object");
+        } catch (Exception e) {
+            log.warn("Could not parse event JSON for {}", event.getId());
+            return null;
+        }
+    }
+
+    private String extractPaymentIntentId(Event event) {
+        JsonObject obj = getDataObject(event);
+        if (obj == null) return null;
+        try {
+            return obj.getAsJsonPrimitive("id").getAsString();
+        } catch (Exception e) {
+            log.warn("Could not extract id from event {}", event.getId());
+            return null;
+        }
+    }
+
+    private String extractPaymentIntentIdFromCharge(Event event) {
+        JsonObject obj = getDataObject(event);
+        if (obj == null) return null;
+        try {
+            return obj.getAsJsonPrimitive("payment_intent").getAsString();
+        } catch (Exception e) {
+            log.warn("Could not extract payment_intent from charge event {}", event.getId());
+            return null;
         }
     }
 

@@ -69,6 +69,7 @@ public class BookingService {
         return toDto(bookingRepository.save(booking));
     }
 
+    @Transactional(readOnly = true)
     public List<BookingDto> getByClient(Long clientId) {
         return bookingRepository.findByClient_Id(clientId)
                 .stream()
@@ -76,6 +77,7 @@ public class BookingService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<BookingDto> getBySpecialist(Long specialistId) {
         return bookingRepository.findByService_SpecialistProfile_Id(specialistId)
                 .stream()
@@ -104,21 +106,31 @@ public class BookingService {
     private BookingDto toDto(Booking booking) {
         ServiceListing svc = booking.getService();
         TimeSlot slot = booking.getTimeSlot();
-        User specialistUser = svc.getSpecialistProfile().getUser();
 
-        Optional<Payment> payment = paymentRepository.findByBooking_Id(booking.getId());
+        String specialistName = null;
+        Long specialistProfileId = null;
+        if (svc.getSpecialistProfile() != null) {
+            specialistProfileId = svc.getSpecialistProfile().getId();
+            if (svc.getSpecialistProfile().getUser() != null) {
+                specialistName = svc.getSpecialistProfile().getUser().getEmail();
+            }
+        }
+
+        Optional<Payment> payment = booking.getId() != null
+                ? paymentRepository.findByBooking_Id(booking.getId())
+                : Optional.empty();
 
         return BookingDto.builder()
                 .id(booking.getId())
                 .clientId(booking.getClient().getId())
                 .serviceId(svc.getId())
-                .specialistProfileId(svc.getSpecialistProfile().getId())
+                .specialistProfileId(specialistProfileId)
                 .timeSlotId(slot.getId())
                 .status(booking.getStatus())
                 .note(booking.getNote())
                 .createdAt(booking.getCreatedAt())
                 .serviceName(svc.getTitle())
-                .specialistName(specialistUser.getEmail())
+                .specialistName(specialistName)
                 .price(svc.getPrice())
                 .slotDate(slot.getSlotDate())
                 .startTime(slot.getStartTime())

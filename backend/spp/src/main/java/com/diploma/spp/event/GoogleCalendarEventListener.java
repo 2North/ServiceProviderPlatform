@@ -22,15 +22,20 @@ public class GoogleCalendarEventListener {
     @Async
     @EventListener
     public void onBookingConfirmed(BookingConfirmedEvent event) {
-        Booking booking = event.getBooking();
+        Long bookingId = event.getBooking().getId();
+        // Перезагружаем с fetch join — lazy associations недоступны в async потоке
+        Booking booking = bookingRepository.findByIdWithDetails(bookingId).orElse(null);
+        if (booking == null) {
+            log.warn("Booking {} not found for Google Calendar sync", bookingId);
+            return;
+        }
         try {
             Map<Long, String> eventIds = googleCalendarService.createEventForBooking(booking);
 
             Long clientId = booking.getClient().getId();
             Long specialistId = booking.getService().getSpecialistProfile().getUser().getId();
 
-            // Persist google event ids back to the booking
-            bookingRepository.findById(booking.getId()).ifPresent(b -> {
+            bookingRepository.findById(bookingId).ifPresent(b -> {
                 if (eventIds.containsKey(clientId)) {
                     b.setGoogleEventIdClient(eventIds.get(clientId));
                 }
@@ -40,19 +45,21 @@ public class GoogleCalendarEventListener {
                 bookingRepository.save(b);
             });
         } catch (Exception e) {
-            log.error("Failed to sync booking {} with Google Calendar: {}", booking.getId(), e.getMessage());
+            log.error("Failed to sync booking {} with Google Calendar: {}", bookingId, e.getMessage(), e);
         }
     }
 
     @Async
     @EventListener
     public void onBookingCancelled(BookingCancelledEvent event) {
-        Booking booking = event.getBooking();
+        Long bookingId = event.getBooking().getId();
+        Booking booking = bookingRepository.findByIdWithDetails(bookingId).orElse(null);
+        if (booking == null) return;
         try {
             googleCalendarService.cancelEventForBooking(booking);
         } catch (Exception e) {
             log.error("Failed to cancel Google Calendar events for booking {}: {}",
-                    booking.getId(), e.getMessage());
+                    bookingId, e.getMessage(), e);
         }
     }
 }
